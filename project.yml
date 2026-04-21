@@ -1,0 +1,37 @@
+name: CosCard
+options:
+  bundleIdPrefix: jp.coscard
+  deploymentTarget:
+    iOS: "17.0"
+  xcodeVersion: "15.0"
+  generateEmptyDirectories: true
+
+settings:
+  base:
+    SWIFT_VERSION: "5.0"
+    DEVELOPMENT_TEAM: ""
+
+targets:
+  CosCard:
+    type: application
+    platform: iOS
+    sources:
+      - path: CosCard
+        excludes:
+          - "**/.DS_Store"
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: jp.coscard.CosCard
+        INFOPLIST_FILE: CosCard/Resources/Info.plist
+        TARGETED_DEVICE_FAMILY: "1"
+        CURRENT_PROJECT_VERSION: 1
+        MARKETING_VERSION: "1.0"
+        ENABLE_PREVIEWS: YES
+    dependencies:
+      - sdk: MultipeerConnectivity.framework
+
+schemes:
+  CosCard:
+    build:
+      targets:
+        CosCard: all
