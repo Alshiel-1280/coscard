@@ -1,4 +1,5 @@
 import SwiftUI
+import UIKit
 
 struct MyCardView: View {
     @EnvironmentObject private var env: AppEnvironment
@@ -34,31 +35,34 @@ struct MyCardView: View {
                 }
             }
         }
-        .task { await vm.load() }
-        .onAppear { vm.attach(env) }
+        .task {
+            vm.attach(env)
+            await vm.load()
+        }
     }
 
     @ViewBuilder
     private var cardContent: some View {
         VStack(alignment: .leading, spacing: AppSpacing.sm) {
             if let p = vm.profile {
-                Text(p.displayName)
-                    .font(.title2.weight(.bold))
-                if let reading = p.displayNameReading, !reading.isEmpty {
-                    Text(reading)
-                        .font(.subheadline)
-                        .foregroundStyle(.secondary)
+                HStack(spacing: AppSpacing.md) {
+                    iconView(data: p.iconThumbnailData)
+                    Text(p.displayName)
+                        .font(.title2.weight(.bold))
                 }
-                if let bio = p.bio, !bio.isEmpty {
-                    Text(bio)
+                if let workSamples = p.bio, !workSamples.isEmpty {
+                    Text(workSamples)
                         .font(.body)
                         .foregroundStyle(.primary)
                         .padding(.top, AppSpacing.xs)
                 }
-                if let label = p.primarySNSLabel, !label.isEmpty, let url = p.primarySNSURL, !url.isEmpty {
-                    LabeledContent(label, value: url)
-                        .font(.caption)
-                        .foregroundStyle(.secondary)
+                if !socialLinks(from: p).isEmpty {
+                    VStack(alignment: .leading, spacing: AppSpacing.xs) {
+                        ForEach(socialLinks(from: p), id: \.label) { item in
+                            socialLinkRow(label: item.label, urlString: item.url)
+                        }
+                    }
+                    .padding(.top, AppSpacing.xs)
                 }
             } else {
                 Text("読み込み中…")
@@ -72,6 +76,66 @@ struct MyCardView: View {
                 .fill(AppColors.card)
                 .shadow(color: .black.opacity(0.06), radius: 8, x: 0, y: 4)
         )
+    }
+
+    @ViewBuilder
+    private func iconView(data: Data?) -> some View {
+        if let data, let image = UIImage(data: data) {
+            Image(uiImage: image)
+                .resizable()
+                .scaledToFill()
+                .frame(width: 56, height: 56)
+                .clipShape(Circle())
+        } else {
+            Circle()
+                .fill(AppColors.card)
+                .frame(width: 56, height: 56)
+                .overlay {
+                    Image(systemName: "person.fill")
+                        .foregroundStyle(.secondary)
+                }
+        }
+    }
+
+    @ViewBuilder
+    private func socialLinkRow(label: String, urlString: String) -> some View {
+        if let url = URL(string: urlString), url.scheme != nil {
+            Link(destination: url) {
+                LabeledContent(label, value: urlString)
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+            }
+        } else {
+            LabeledContent(label, value: urlString)
+                .font(.caption)
+                .foregroundStyle(.secondary)
+        }
+    }
+
+    private func socialLinks(from profile: ProfileSummary) -> [(label: String, url: String)] {
+        var links: [(label: String, url: String)] = []
+        if let twitter = normalized(profile.twitterURL) {
+            links.append(("Twitter", twitter))
+        }
+        if let instagram = normalized(profile.instagramURL) {
+            links.append(("Instagram", instagram))
+        }
+        if let tiktok = normalized(profile.tiktokURL) {
+            links.append(("TikTok", tiktok))
+        }
+        if links.isEmpty,
+           let label = normalized(profile.primarySNSLabel),
+           let url = normalized(profile.primarySNSURL)
+        {
+            links.append((label, url))
+        }
+        return links
+    }
+
+    private func normalized(_ value: String?) -> String? {
+        guard let value else { return nil }
+        let trimmed = value.trimmedCoscard()
+        return trimmed.isEmpty ? nil : trimmed
     }
 }
 

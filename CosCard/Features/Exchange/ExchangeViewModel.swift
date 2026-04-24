@@ -61,6 +61,18 @@ final class ExchangeViewModel: ObservableObject {
         pollTask = nil
     }
 
+    func ensureExchangeModeEnabled() async {
+        guard let env else { return }
+        if env.nearby.exchangeState == .idle {
+            await startExchange()
+            return
+        }
+        if pollTask == nil {
+            startPolling()
+        }
+        syncFromNearby()
+    }
+
     func startExchange() async {
         guard let env else { return }
         errorMessage = nil

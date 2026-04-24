@@ -115,7 +115,7 @@
 		4D8D4E0B4AF1D1E71162108A /* Logger.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Logger.swift; sourceTree = "<group>"; };
 		4EE6A3FCC42D68DCF422E677 /* ExchangeSessionEntity.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExchangeSessionEntity.swift; sourceTree = "<group>"; };
 		556FF66C9B3F1F98AB856C48 /* EventTagEntity.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EventTagEntity.swift; sourceTree = "<group>"; };
-		55711C6E52B05C22BFBA2979 /* CosCard.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = CosCard.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		55711C6E52B05C22BFBA2979 /* CosCard.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = CosCard.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		56A51409396311FA2977838B /* MultipeerConnectivity.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = MultipeerConnectivity.framework; path = System/Library/Frameworks/MultipeerConnectivity.framework; sourceTree = SDKROOT; };
 		574F1C451E5B5E2FA521C5D1 /* LightweightProfileSnapshotEntity.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LightweightProfileSnapshotEntity.swift; sourceTree = "<group>"; };
 		6221A561F61C3410DAD2BC6A /* Date+Format.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Date+Format.swift"; sourceTree = "<group>"; };
@@ -540,11 +540,6 @@
 			attributes = {
 				BuildIndependentTargetsInParallel = YES;
 				LastUpgradeCheck = 1500;
-				TargetAttributes = {
-					FEF4CE1AADB8EA477B9B9BAD = {
-						DevelopmentTeam = "";
-					};
-				};
 			};
 			buildConfigurationList = DCB4741092EF78E2BD091D1B /* Build configuration list for PBXProject "CosCard" */;
 			developmentRegion = en;
@@ -781,6 +776,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = SN5WS5KXT3;
 				ENABLE_PREVIEWS = YES;
 				INFOPLIST_FILE = CosCard/Resources/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -800,6 +796,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = SN5WS5KXT3;
 				ENABLE_PREVIEWS = YES;
 				INFOPLIST_FILE = CosCard/Resources/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (

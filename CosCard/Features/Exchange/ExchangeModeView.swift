@@ -47,8 +47,9 @@ struct ExchangeModeView: View {
                 }
             }
             Section {
-                Button("探索を開始") { Task { await vm.startExchange() } }
-                Button("停止", role: .destructive) { Task { await vm.stopExchange() } }
+                Text("この画面を開くと探索は自動で開始されます。")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
             }
             if let err = vm.errorMessage {
                 Section { Text(err).foregroundStyle(AppColors.danger) }
@@ -83,7 +84,7 @@ struct ExchangeModeView: View {
         }
         .onAppear {
             vm.attach(env)
-            vm.syncFromNearby()
+            Task { await vm.ensureExchangeModeEnabled() }
         }
         .onDisappear {
             vm.cancelPolling()

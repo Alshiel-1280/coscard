@@ -22,12 +22,15 @@ final class ProfileRepository: ProfileRepositoryProtocol {
         descriptor.fetchLimit = 1
         let existing = try modelContext.fetch(descriptor).first
         let now = Date()
+        let resolvedPrimarySNS = resolvePrimarySNS(from: draft)
         if let e = existing {
             e.displayName = draft.displayName
-            e.displayNameReading = draft.displayNameReading
             e.bio = draft.bio
-            e.primarySNSLabel = draft.primarySNSLabel
-            e.primarySNSURL = draft.primarySNSURL
+            e.primarySNSLabel = resolvedPrimarySNS.label
+            e.primarySNSURL = resolvedPrimarySNS.url
+            e.twitterURL = draft.twitterURL
+            e.instagramURL = draft.instagramURL
+            e.tiktokURL = draft.tiktokURL
             e.iconThumbnailData = draft.iconThumbnailData
             e.profileVersion += 1
             e.updatedAt = now
@@ -36,10 +39,12 @@ final class ProfileRepository: ProfileRepositoryProtocol {
         }
         let e = UserProfileEntity(
             displayName: draft.displayName,
-            displayNameReading: draft.displayNameReading,
             bio: draft.bio,
-            primarySNSLabel: draft.primarySNSLabel,
-            primarySNSURL: draft.primarySNSURL,
+            primarySNSLabel: resolvedPrimarySNS.label,
+            primarySNSURL: resolvedPrimarySNS.url,
+            twitterURL: draft.twitterURL,
+            instagramURL: draft.instagramURL,
+            tiktokURL: draft.tiktokURL,
             iconThumbnailData: draft.iconThumbnailData,
             createdAt: now,
             updatedAt: now
@@ -53,13 +58,38 @@ final class ProfileRepository: ProfileRepositoryProtocol {
         ProfileSummary(
             id: e.id,
             displayName: e.displayName,
-            displayNameReading: e.displayNameReading,
             bio: e.bio,
             primarySNSLabel: e.primarySNSLabel,
             primarySNSURL: e.primarySNSURL,
+            twitterURL: e.twitterURL,
+            instagramURL: e.instagramURL,
+            tiktokURL: e.tiktokURL,
             iconThumbnailData: e.iconThumbnailData,
             profileVersion: e.profileVersion,
             updatedAt: e.updatedAt
         )
+    }
+
+    private func resolvePrimarySNS(from draft: ProfileDraft) -> (label: String?, url: String?) {
+        let twitter = draft.twitterURL?.trimmedCoscard() ?? ""
+        if !twitter.isEmpty {
+            return ("Twitter", twitter)
+        }
+
+        let instagram = draft.instagramURL?.trimmedCoscard() ?? ""
+        if !instagram.isEmpty {
+            return ("Instagram", instagram)
+        }
+
+        let tiktok = draft.tiktokURL?.trimmedCoscard() ?? ""
+        if !tiktok.isEmpty {
+            return ("TikTok", tiktok)
+        }
+
+        let label = draft.primarySNSLabel?.trimmedCoscard()
+        let url = draft.primarySNSURL?.trimmedCoscard()
+        let resolvedLabel = (label?.isEmpty == false) ? label : nil
+        let resolvedURL = (url?.isEmpty == false) ? url : nil
+        return (resolvedLabel, resolvedURL)
     }
 }

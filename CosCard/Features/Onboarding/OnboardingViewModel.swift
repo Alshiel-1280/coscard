@@ -16,10 +16,12 @@ final class OnboardingViewModel: ObservableObject {
         errorMessage = nil
         let draft = ProfileDraft(
             displayName: displayName.trimmedCoscard(),
-            displayNameReading: nil,
             bio: nil,
             primarySNSLabel: nil,
             primarySNSURL: nil,
+            twitterURL: nil,
+            instagramURL: nil,
+            tiktokURL: nil,
             iconThumbnailData: nil
         )
         guard let env else { return false }

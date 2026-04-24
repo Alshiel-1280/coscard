@@ -2,20 +2,24 @@ import Foundation
 
 struct ProfileDraft: Sendable {
     var displayName: String
-    var displayNameReading: String?
     var bio: String?
     var primarySNSLabel: String?
     var primarySNSURL: String?
+    var twitterURL: String?
+    var instagramURL: String?
+    var tiktokURL: String?
     var iconThumbnailData: Data?
 }
 
 struct ProfileSummary: Equatable, Sendable {
     var id: UUID
     var displayName: String
-    var displayNameReading: String?
     var bio: String?
     var primarySNSLabel: String?
     var primarySNSURL: String?
+    var twitterURL: String?
+    var instagramURL: String?
+    var tiktokURL: String?
     var iconThumbnailData: Data?
     var profileVersion: Int
     var updatedAt: Date

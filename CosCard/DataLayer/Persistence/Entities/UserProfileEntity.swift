@@ -9,6 +9,9 @@ final class UserProfileEntity {
     var bio: String?
     var primarySNSLabel: String?
     var primarySNSURL: String?
+    var twitterURL: String?
+    var instagramURL: String?
+    var tiktokURL: String?
     var iconLocalPath: String?
     @Attribute(.externalStorage) var iconThumbnailData: Data?
     var visibilityLevel: String
@@ -23,6 +26,9 @@ final class UserProfileEntity {
         bio: String? = nil,
         primarySNSLabel: String? = nil,
         primarySNSURL: String? = nil,
+        twitterURL: String? = nil,
+        instagramURL: String? = nil,
+        tiktokURL: String? = nil,
         iconLocalPath: String? = nil,
         iconThumbnailData: Data? = nil,
         visibilityLevel: String = "public",
@@ -36,6 +42,9 @@ final class UserProfileEntity {
         self.bio = bio
         self.primarySNSLabel = primarySNSLabel
         self.primarySNSURL = primarySNSURL
+        self.twitterURL = twitterURL
+        self.instagramURL = instagramURL
+        self.tiktokURL = tiktokURL
         self.iconLocalPath = iconLocalPath
         self.iconThumbnailData = iconThumbnailData
         self.visibilityLevel = visibilityLevel
