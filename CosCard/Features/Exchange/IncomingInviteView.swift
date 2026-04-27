@@ -11,9 +11,12 @@ struct IncomingInviteView: View {
                 .font(.title2.bold())
             Text(previewName)
                 .font(.headline)
+                .accessibilityLabel("\(previewName)からの交換リクエスト")
             HStack(spacing: AppSpacing.md) {
                 Button("拒否", role: .destructive) { onReject() }
+                    .accessibilityHint("このリクエストを断ります")
                 Button("承諾") { onAccept() }
+                    .accessibilityHint("交換を開始します")
             }
             .buttonStyle(.borderedProminent)
         }

@@ -3,6 +3,7 @@ import Foundation
 /// 交換用の軽量プロフィール（ドメイン値）。SwiftData Entity は View に渡さない。
 struct LightweightProfile: Equatable, Sendable {
     var ephemeralToken: String
+    var publicProfileId: String?
     var displayName: String
     var bioShort: String?
     var primarySNSLabel: String?
@@ -12,6 +13,7 @@ struct LightweightProfile: Equatable, Sendable {
 
     init(
         ephemeralToken: String,
+        publicProfileId: String? = nil,
         displayName: String,
         bioShort: String? = nil,
         primarySNSLabel: String? = nil,
@@ -20,6 +22,7 @@ struct LightweightProfile: Equatable, Sendable {
         iconThumbnailData: Data? = nil
     ) {
         self.ephemeralToken = ephemeralToken
+        self.publicProfileId = publicProfileId
         self.displayName = displayName
         self.bioShort = bioShort
         self.primarySNSLabel = primarySNSLabel

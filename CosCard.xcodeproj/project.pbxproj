@@ -15,9 +15,11 @@
 		10229B0A9B6EDBD47D3F94F1 /* ExchangeProgressView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9C25A80ACAE944A61FCBAC1D /* ExchangeProgressView.swift */; };
 		105766D27883ACB5B2970C48 /* ProfileEditViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 175219A8271B299E672EC5A0 /* ProfileEditViewModel.swift */; };
 		10648ED098A4B9FD34EB904C /* QRCodeGenerator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 755925323B0AA76817C48B01 /* QRCodeGenerator.swift */; };
+		138748E1D3B237DD079B887E /* ProfileValidationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1B05882145CFD6EC59AF5E60 /* ProfileValidationTests.swift */; };
 		14B91DA5CDD659CAC232A26B /* MyCardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7488D51E2A01A935F9F106E4 /* MyCardView.swift */; };
 		157A0D6C81B50AC9161DB95A /* ImageResizer.swift in Sources */ = {isa = PBXBuildFile; fileRef = E85DF252ACB68AE543FB81FE /* ImageResizer.swift */; };
 		15E56219723EE7EEAF776B4D /* QRScannerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6A956EE8875299C40A759346 /* QRScannerView.swift */; };
+		169054682FE1EFFC7CF3D5B4 /* TokenRepositoryTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 46F1CF5D279F6B7BAAC75F4A /* TokenRepositoryTests.swift */; };
 		18516E773AD9A04D094343F5 /* Logger.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4D8D4E0B4AF1D1E71162108A /* Logger.swift */; };
 		1B4BCFB6928F2508808BE023 /* LightweightProfileSnapshotEntity.swift in Sources */ = {isa = PBXBuildFile; fileRef = 574F1C451E5B5E2FA521C5D1 /* LightweightProfileSnapshotEntity.swift */; };
 		1D61B3EB34022D4185FBB1A6 /* ExchangeTokenEntity.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6958C96466649E5396E00CD /* ExchangeTokenEntity.swift */; };
@@ -35,6 +37,7 @@
 		39C2C664355EBC66F29E4E64 /* PeerDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CD580ED17971FF588371664D /* PeerDetailView.swift */; };
 		414DA4C5105C4945A2A8D55C /* MPCManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7E167C7BA9D81C626B78C80 /* MPCManager.swift */; };
 		419EFFACDC23ABF6404169EB /* AppSpacing.swift in Sources */ = {isa = PBXBuildFile; fileRef = 703910C1A8C83A6D9CB5C239 /* AppSpacing.swift */; };
+		4969BF8A2F2010CF62A718D8 /* SaveExchangeResultUseCaseTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 330466158226A6F42026D118 /* SaveExchangeResultUseCaseTests.swift */; };
 		4D3F617635BDC3F6A75F99D2 /* OnboardingViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = FCEE8111E78C448B2E301D41 /* OnboardingViewModel.swift */; };
 		4E8358D013E7DC2C8B31D509 /* HistoryListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8B9271024118379587318A65 /* HistoryListView.swift */; };
 		4FB80777485651FF14AD8B1A /* RootView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F4F1BABA990F92FF76ABE15C /* RootView.swift */; };
@@ -46,7 +49,9 @@
 		67A911FF7F87462BE09F0EB8 /* LightweightProfile.swift in Sources */ = {isa = PBXBuildFile; fileRef = 018E8FE6619604F0D8A028DC /* LightweightProfile.swift */; };
 		68095823BE124C4E891E5C32 /* LaunchView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48F1C808BE01D5DBEE8732BF /* LaunchView.swift */; };
 		6D1596CB8F551FE98CD5629F /* MPCMessageEncoder.swift in Sources */ = {isa = PBXBuildFile; fileRef = C3E57D57F0A531D4A3B7763A /* MPCMessageEncoder.swift */; };
+		7196B5492B4D8AF36A4C10BF /* PeerRepositoryTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 54F2105AEC0EB1E53D11EF0E /* PeerRepositoryTests.swift */; };
 		721DC464A2C2D23878ABD76E /* ExchangeSessionRepositoryProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = 28C8F4241814E4F9C2F2DE8A /* ExchangeSessionRepositoryProtocol.swift */; };
+		746FA3B5B78BF8D162257EB1 /* AppNotifications.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1DD855D6ABCD94405CD2BAD9 /* AppNotifications.swift */; };
 		7634F64163334F54EEB51D2B /* AppEnvironment.swift in Sources */ = {isa = PBXBuildFile; fileRef = 045686CA80BCF09C9594885D /* AppEnvironment.swift */; };
 		7A901D848A94F9B4FF39837B /* PeerDetailViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = E0D2C58CDF2DEB605B322F41 /* PeerDetailViewModel.swift */; };
 		80826620D658D37958480E78 /* ExchangeViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 990A555C6DA005AFF60D6978 /* ExchangeViewModel.swift */; };
@@ -54,6 +59,7 @@
 		8490D81C76A63FAB870A6DE2 /* SaveExchangeResultUseCase.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1EEE82029F0C9B636E1D1428 /* SaveExchangeResultUseCase.swift */; };
 		8ACC03F015CAD517320B78AB /* PeerContactEntity.swift in Sources */ = {isa = PBXBuildFile; fileRef = D09F8D47BC157F0E7AF8FD87 /* PeerContactEntity.swift */; };
 		8DC5FA9EDA0230C843DBAFB0 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC0EF0B48DFCD1F266B1AAE9 /* SettingsView.swift */; };
+		9117800EA1995F01087DEBC9 /* LocalPeerKeyTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 206F2F43182FD6E5E2A199E5 /* LocalPeerKeyTests.swift */; };
 		A1C641F1DA3304038A9FEA84 /* TokenRepository.swift in Sources */ = {isa = PBXBuildFile; fileRef = 78005C41E1A144F0729FA91A /* TokenRepository.swift */; };
 		A8797E1CB564D05CB55A7665 /* ExchangeSessionEntity.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4EE6A3FCC42D68DCF422E677 /* ExchangeSessionEntity.swift */; };
 		ACAF14066DD349470D22EE05 /* Checksum.swift in Sources */ = {isa = PBXBuildFile; fileRef = F47745DECA4C1668A4498886 /* Checksum.swift */; };
@@ -86,36 +92,55 @@
 		F60A9E74B2A8520C754C06A2 /* CosCardApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9C649CCEBB2C131FD14B620A /* CosCardApp.swift */; };
 		FA1D48F65159D03A94A043EE /* HistoryListViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 44AC312D088C37AF86C99388 /* HistoryListViewModel.swift */; };
 		FB1C79DABFAF1EDD74EE611C /* MultipeerConnectivity.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 56A51409396311FA2977838B /* MultipeerConnectivity.framework */; };
+		FC642ACAD80B5D68516765DD /* MPCMessageEncoderTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 064A440B74B7E218DDE72698 /* MPCMessageEncoderTests.swift */; };
 /* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		F19DC8FDF11B5C5865AB831F /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 02C28B66B6D4B615D80A21C3 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = FEF4CE1AADB8EA477B9B9BAD;
+			remoteInfo = CosCard;
+		};
+/* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
 		018E8FE6619604F0D8A028DC /* LightweightProfile.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LightweightProfile.swift; sourceTree = "<group>"; };
 		045686CA80BCF09C9594885D /* AppEnvironment.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppEnvironment.swift; sourceTree = "<group>"; };
+		064A440B74B7E218DDE72698 /* MPCMessageEncoderTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MPCMessageEncoderTests.swift; sourceTree = "<group>"; };
 		06E2773BE42F3CA383652053 /* StartExchangeUseCase.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StartExchangeUseCase.swift; sourceTree = "<group>"; };
 		079378C4E7AD8983B31C7A49 /* ExchangeCompleteView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExchangeCompleteView.swift; sourceTree = "<group>"; };
 		0C0FF491C9E42D8649D37789 /* ResolveDuplicateExchangeUseCase.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ResolveDuplicateExchangeUseCase.swift; sourceTree = "<group>"; };
+		0FE98013456D68D89A65264A /* CosCardTests.xctest */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.cfbundle; path = CosCardTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		104342698CE0A25F21C5E126 /* TermsOfServiceView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TermsOfServiceView.swift; sourceTree = "<group>"; };
 		12189C9321C88334341E9E06 /* LocalPeerKey.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocalPeerKey.swift; sourceTree = "<group>"; };
 		175219A8271B299E672EC5A0 /* ProfileEditViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileEditViewModel.swift; sourceTree = "<group>"; };
+		1B05882145CFD6EC59AF5E60 /* ProfileValidationTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileValidationTests.swift; sourceTree = "<group>"; };
+		1DD855D6ABCD94405CD2BAD9 /* AppNotifications.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppNotifications.swift; sourceTree = "<group>"; };
 		1EEE82029F0C9B636E1D1428 /* SaveExchangeResultUseCase.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SaveExchangeResultUseCase.swift; sourceTree = "<group>"; };
 		1F482CACF78919227CFC6EB0 /* ExchangeState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExchangeState.swift; sourceTree = "<group>"; };
+		206F2F43182FD6E5E2A199E5 /* LocalPeerKeyTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocalPeerKeyTests.swift; sourceTree = "<group>"; };
 		234F88876CC6A81F31E463BA /* IncomingInviteView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IncomingInviteView.swift; sourceTree = "<group>"; };
 		28C8F4241814E4F9C2F2DE8A /* ExchangeSessionRepositoryProtocol.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExchangeSessionRepositoryProtocol.swift; sourceTree = "<group>"; };
 		31CDAA006711679913D8617A /* PeerRepository.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PeerRepository.swift; sourceTree = "<group>"; };
+		330466158226A6F42026D118 /* SaveExchangeResultUseCaseTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SaveExchangeResultUseCaseTests.swift; sourceTree = "<group>"; };
 		3995C9E43C0841DD503188E0 /* KeychainStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeychainStore.swift; sourceTree = "<group>"; };
 		3F125810ED534839EF6E6A12 /* SendInviteUseCase.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SendInviteUseCase.swift; sourceTree = "<group>"; };
 		41262FDD63E9579C8BC369DD /* UserProfileEntity.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserProfileEntity.swift; sourceTree = "<group>"; };
 		41B5D4C4BB9B200220864EE7 /* ExchangeFailureReason.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExchangeFailureReason.swift; sourceTree = "<group>"; };
 		44AC312D088C37AF86C99388 /* HistoryListViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HistoryListViewModel.swift; sourceTree = "<group>"; };
 		469E072171D6AF8343486A08 /* LoadInitialStateUseCase.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoadInitialStateUseCase.swift; sourceTree = "<group>"; };
+		46F1CF5D279F6B7BAAC75F4A /* TokenRepositoryTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TokenRepositoryTests.swift; sourceTree = "<group>"; };
 		4720176FCB8664CA61483E12 /* MPCPeerHandle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MPCPeerHandle.swift; sourceTree = "<group>"; };
 		48F1C808BE01D5DBEE8732BF /* LaunchView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LaunchView.swift; sourceTree = "<group>"; };
 		49351BAEF75DFAB1B1C40AA2 /* StopExchangeUseCase.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StopExchangeUseCase.swift; sourceTree = "<group>"; };
 		4BD53AB497769802F8F07CD3 /* NearbyServiceProtocol.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NearbyServiceProtocol.swift; sourceTree = "<group>"; };
 		4D8D4E0B4AF1D1E71162108A /* Logger.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Logger.swift; sourceTree = "<group>"; };
 		4EE6A3FCC42D68DCF422E677 /* ExchangeSessionEntity.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExchangeSessionEntity.swift; sourceTree = "<group>"; };
+		54F2105AEC0EB1E53D11EF0E /* PeerRepositoryTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PeerRepositoryTests.swift; sourceTree = "<group>"; };
 		556FF66C9B3F1F98AB856C48 /* EventTagEntity.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EventTagEntity.swift; sourceTree = "<group>"; };
-		55711C6E52B05C22BFBA2979 /* CosCard.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = CosCard.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		55711C6E52B05C22BFBA2979 /* CosCard.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = CosCard.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		56A51409396311FA2977838B /* MultipeerConnectivity.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = MultipeerConnectivity.framework; path = System/Library/Frameworks/MultipeerConnectivity.framework; sourceTree = SDKROOT; };
 		574F1C451E5B5E2FA521C5D1 /* LightweightProfileSnapshotEntity.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LightweightProfileSnapshotEntity.swift; sourceTree = "<group>"; };
 		6221A561F61C3410DAD2BC6A /* Date+Format.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Date+Format.swift"; sourceTree = "<group>"; };
@@ -220,6 +245,7 @@
 			isa = PBXGroup;
 			children = (
 				55711C6E52B05C22BFBA2979 /* CosCard.app */,
+				0FE98013456D68D89A65264A /* CosCardTests.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -368,6 +394,19 @@
 			path = Models;
 			sourceTree = "<group>";
 		};
+		8F1FC60D3612154B590A292E /* CosCardTests */ = {
+			isa = PBXGroup;
+			children = (
+				206F2F43182FD6E5E2A199E5 /* LocalPeerKeyTests.swift */,
+				064A440B74B7E218DDE72698 /* MPCMessageEncoderTests.swift */,
+				54F2105AEC0EB1E53D11EF0E /* PeerRepositoryTests.swift */,
+				1B05882145CFD6EC59AF5E60 /* ProfileValidationTests.swift */,
+				330466158226A6F42026D118 /* SaveExchangeResultUseCaseTests.swift */,
+				46F1CF5D279F6B7BAAC75F4A /* TokenRepositoryTests.swift */,
+			);
+			path = CosCardTests;
+			sourceTree = "<group>";
+		};
 		9459070D887DB00A685F0ED0 /* CosCard */ = {
 			isa = PBXGroup;
 			children = (
@@ -385,6 +424,7 @@
 		952ED5CE692B39E781D8BBEE /* Utils */ = {
 			isa = PBXGroup;
 			children = (
+				1DD855D6ABCD94405CD2BAD9 /* AppNotifications.swift */,
 				F47745DECA4C1668A4498886 /* Checksum.swift */,
 				DF4E167DEB228728FEA48BE9 /* ConfirmationCodeGenerator.swift */,
 				E85DF252ACB68AE543FB81FE /* ImageResizer.swift */,
@@ -475,6 +515,7 @@
 			isa = PBXGroup;
 			children = (
 				9459070D887DB00A685F0ED0 /* CosCard */,
+				8F1FC60D3612154B590A292E /* CosCardTests */,
 				6A291225607C40F5BA0B998A /* Frameworks */,
 				1384EB4F0054DEA7E82AA54E /* Products */,
 			);
@@ -514,6 +555,24 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
+		785FAF0BE90809DE991FECC0 /* CosCardTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = AF9BD53A843C6B5EAD38BED8 /* Build configuration list for PBXNativeTarget "CosCardTests" */;
+			buildPhases = (
+				587EC5ABFA23E938B2F557B0 /* Sources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				0139D1F40ECE07A0CDAD7972 /* PBXTargetDependency */,
+			);
+			name = CosCardTests;
+			packageProductDependencies = (
+			);
+			productName = CosCardTests;
+			productReference = 0FE98013456D68D89A65264A /* CosCardTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
 		FEF4CE1AADB8EA477B9B9BAD /* CosCard */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = 2E5B037D345261E0678CF7C9 /* Build configuration list for PBXNativeTarget "CosCard" */;
@@ -540,6 +599,14 @@
 			attributes = {
 				BuildIndependentTargetsInParallel = YES;
 				LastUpgradeCheck = 1500;
+				TargetAttributes = {
+					785FAF0BE90809DE991FECC0 = {
+						DevelopmentTeam = "";
+					};
+					FEF4CE1AADB8EA477B9B9BAD = {
+						DevelopmentTeam = "";
+					};
+				};
 			};
 			buildConfigurationList = DCB4741092EF78E2BD091D1B /* Build configuration list for PBXProject "CosCard" */;
 			developmentRegion = en;
@@ -556,11 +623,25 @@
 			projectRoot = "";
 			targets = (
 				FEF4CE1AADB8EA477B9B9BAD /* CosCard */,
+				785FAF0BE90809DE991FECC0 /* CosCardTests */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXSourcesBuildPhase section */
+		587EC5ABFA23E938B2F557B0 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				9117800EA1995F01087DEBC9 /* LocalPeerKeyTests.swift in Sources */,
+				FC642ACAD80B5D68516765DD /* MPCMessageEncoderTests.swift in Sources */,
+				7196B5492B4D8AF36A4C10BF /* PeerRepositoryTests.swift in Sources */,
+				138748E1D3B237DD079B887E /* ProfileValidationTests.swift in Sources */,
+				4969BF8A2F2010CF62A718D8 /* SaveExchangeResultUseCaseTests.swift in Sources */,
+				169054682FE1EFFC7CF3D5B4 /* TokenRepositoryTests.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		C7A8A07274BA0E38BB988312 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -568,6 +649,7 @@
 				5B844EFF11421B547C53FBFF /* AcceptInviteUseCase.swift in Sources */,
 				62D4A06FC3D2730E2416E80A /* AppColors.swift in Sources */,
 				7634F64163334F54EEB51D2B /* AppEnvironment.swift in Sources */,
+				746FA3B5B78BF8D162257EB1 /* AppNotifications.swift in Sources */,
 				419EFFACDC23ABF6404169EB /* AppSpacing.swift in Sources */,
 				3752CE93253DEE4152BDCF77 /* BlockListView.swift in Sources */,
 				0F219D85A662791B3BE38820 /* BlockListViewModel.swift in Sources */,
@@ -648,6 +730,14 @@
 		};
 /* End PBXSourcesBuildPhase section */
 
+/* Begin PBXTargetDependency section */
+		0139D1F40ECE07A0CDAD7972 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = FEF4CE1AADB8EA477B9B9BAD /* CosCard */;
+			targetProxy = F19DC8FDF11B5C5865AB831F /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
 /* Begin XCBuildConfiguration section */
 		157EA573DC565E1979EE0859 /* Release */ = {
 			isa = XCBuildConfiguration;
@@ -703,6 +793,40 @@
 				SWIFT_COMPILATION_MODE = wholemodule;
 				SWIFT_OPTIMIZATION_LEVEL = "-O";
 				SWIFT_VERSION = 5.0;
+			};
+			name = Release;
+		};
+		8AF1A422680D307508335B8B /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				GENERATE_INFOPLIST_FILE = YES;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = jp.coscard.CosCardTests;
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/CosCard.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/CosCard";
+			};
+			name = Debug;
+		};
+		92D4D11EAD24931221963663 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				GENERATE_INFOPLIST_FILE = YES;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = jp.coscard.CosCardTests;
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/CosCard.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/CosCard";
 			};
 			name = Release;
 		};
@@ -776,7 +900,6 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = SN5WS5KXT3;
 				ENABLE_PREVIEWS = YES;
 				INFOPLIST_FILE = CosCard/Resources/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -796,7 +919,6 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = SN5WS5KXT3;
 				ENABLE_PREVIEWS = YES;
 				INFOPLIST_FILE = CosCard/Resources/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -818,6 +940,15 @@
 			buildConfigurations = (
 				D5ECAD592B65AE62F6D5FA69 /* Debug */,
 				F3696D9A73FDFBC5DFC54933 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		AF9BD53A843C6B5EAD38BED8 /* Build configuration list for PBXNativeTarget "CosCardTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				8AF1A422680D307508335B8B /* Debug */,
+				92D4D11EAD24931221963663 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Debug;

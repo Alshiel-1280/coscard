@@ -76,6 +76,38 @@ final class TokenRepository: TokenRepositoryProtocol {
         try modelContext.save()
     }
 
+    func isTokenAlreadySeen(_ value: String) async throws -> Bool {
+        let search = value
+        var descriptor = FetchDescriptor<ExchangeTokenEntity>(
+            predicate: #Predicate { $0.tokenValue == search }
+        )
+        descriptor.fetchLimit = 1
+        return try modelContext.fetch(descriptor).first != nil
+    }
+
+    func recordIncomingTokenIfNew(value: String, sessionId: UUID, peerContactId: UUID?) async throws -> Bool {
+        let search = value
+        var descriptor = FetchDescriptor<ExchangeTokenEntity>(
+            predicate: #Predicate { $0.tokenValue == search }
+        )
+        descriptor.fetchLimit = 1
+        if try modelContext.fetch(descriptor).first != nil {
+            return false
+        }
+        let now = Date()
+        let e = ExchangeTokenEntity(
+            tokenValue: value,
+            direction: "incoming",
+            issuedAt: now,
+            expiresAt: now.addingTimeInterval(ttlSeconds),
+            linkedSessionId: sessionId,
+            linkedPeerContactId: peerContactId
+        )
+        modelContext.insert(e)
+        try modelContext.save()
+        return true
+    }
+
     func pruneExpired() async throws {
         let now = Date()
         var descriptor = FetchDescriptor<ExchangeTokenEntity>(

@@ -28,6 +28,10 @@
 	<string>QR コード交換にカメラを使用します。</string>
 	<key>NSLocalNetworkUsageDescription</key>
 	<string>近くのユーザーとプロフィール交換するためにローカルネットワークを使用します。</string>
+	<key>NSBonjourServices</key>
+	<array>
+		<string>_coscard._tcp</string>
+	</array>
 	<key>UIApplicationSceneManifest</key>
 	<dict>
 		<key>UIApplicationSupportsMultipleScenes</key>

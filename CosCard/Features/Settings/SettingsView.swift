@@ -4,6 +4,7 @@ struct SettingsView: View {
     @EnvironmentObject private var env: AppEnvironment
     @StateObject private var vm = SettingsViewModel()
     @AppStorage("coscard.settings.notifyExchangeRequest") private var notifyExchangeRequest = true
+    @State private var showTokenDeleteConfirm = false
 
     private var appVersion: String {
         let v = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "—"
@@ -32,7 +33,7 @@ struct SettingsView: View {
             }
             Section {
                 Button {
-                    Task { await vm.clearExpiredTokens() }
+                    showTokenDeleteConfirm = true
                 } label: {
                     Label("期限切れトークンを削除", systemImage: "trash")
                 }
@@ -61,6 +62,11 @@ struct SettingsView: View {
         .navigationTitle("設定")
         .navigationBarTitleDisplayMode(.inline)
         .onAppear { vm.attach(env) }
+        .confirmationDialog("期限切れトークンを削除しますか？", isPresented: $showTokenDeleteConfirm, titleVisibility: .visible) {
+            Button("削除", role: .destructive) {
+                Task { await vm.clearExpiredTokens() }
+            }
+        }
         .alert("結果", isPresented: $vm.showResultAlert) {
             Button("OK", role: .cancel) {}
         } message: {

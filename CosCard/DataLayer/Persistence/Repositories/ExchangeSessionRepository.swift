@@ -60,6 +60,16 @@ final class ExchangeSessionRepository: ExchangeSessionRepositoryProtocol {
         try modelContext.save()
     }
 
+    func failSession(id: UUID, state: ExchangeState, failureReason: ExchangeFailureReason?) async throws {
+        guard let e = try fetch(id: id) else { return }
+        if e.result == "success" { return }
+        e.endedAt = .now
+        e.result = "failure"
+        e.failureReason = failureReason?.rawValue
+        e.state = state.rawValue
+        try modelContext.save()
+    }
+
     private func fetch(id: UUID) throws -> ExchangeSessionEntity? {
         var descriptor = FetchDescriptor<ExchangeSessionEntity>(
             predicate: #Predicate { $0.id == id }

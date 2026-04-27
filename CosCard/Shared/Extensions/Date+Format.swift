@@ -1,11 +1,15 @@
 import Foundation
 
 extension Date {
-    func coscardShortString(locale: Locale = .current) -> String {
+    private static let coscardShortFormatter: DateFormatter = {
         let f = DateFormatter()
-        f.locale = locale
+        f.locale = .current
         f.dateStyle = .medium
         f.timeStyle = .short
-        return f.string(from: self)
+        return f
+    }()
+
+    func coscardShortString() -> String {
+        Self.coscardShortFormatter.string(from: self)
     }
 }

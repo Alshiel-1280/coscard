@@ -8,10 +8,12 @@ enum ImageResizer {
         guard size.width > 0, size.height > 0 else { return nil }
         let scale = min(maxSide / size.width, maxSide / size.height, 1)
         let newSize = CGSize(width: size.width * scale, height: size.height * scale)
-        UIGraphicsBeginImageContextWithOptions(newSize, true, 1)
-        defer { UIGraphicsEndImageContext() }
-        image.draw(in: CGRect(origin: .zero, size: newSize))
-        guard let resized = UIGraphicsGetImageFromCurrentImageContext() else { return nil }
-        return resized.jpegData(compressionQuality: quality)
+        let format = UIGraphicsImageRendererFormat()
+        format.scale = 1
+        format.opaque = true
+        let renderer = UIGraphicsImageRenderer(size: newSize, format: format)
+        return renderer.jpegData(withCompressionQuality: quality) { ctx in
+            image.draw(in: CGRect(origin: .zero, size: newSize))
+        }
     }
 }

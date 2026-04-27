@@ -9,8 +9,19 @@ final class QRExchangeViewModel: ObservableObject {
     @Published var errorMessage: String?
     @Published var scanSuccessMessage: String?
     @Published var showScanner = false
+    @Published var showScanComplete = false
+    @Published var pendingScanPeerName = ""
 
     private var env: AppEnvironment?
+    private var scannedProfile: LightweightProfile?
+    private var scannedSessionId: UUID?
+    private var scannedExchangeIds: Set<UUID> = []
+
+    private let jsonDecoder: JSONDecoder = {
+        let d = JSONDecoder()
+        d.dateDecodingStrategy = .iso8601
+        return d
+    }()
 
     func attach(_ environment: AppEnvironment) {
         env = environment
@@ -34,8 +45,10 @@ final class QRExchangeViewModel: ObservableObject {
             }
             let token = try await GenerateEphemeralTokenUseCase(tokenRepository: env.tokenRepository)
                 .execute(sessionId: sid)
+            let publicId = try await env.profileRepository.ensurePublicProfileId()
             let pay = LightweightProfilePayload(
                 ephemeralToken: token,
+                publicProfileId: publicId,
                 displayName: profile.displayName,
                 bioShort: profile.bio,
                 primarySNSLabel: profile.primarySNSLabel,
@@ -43,19 +56,22 @@ final class QRExchangeViewModel: ObservableObject {
                 profileVersion: profile.profileVersion,
                 iconThumbnailData: nil
             )
+            let expiresAt = Date().addingTimeInterval(180)
             let data = try MPCMessageEncoder.encodeEnvelope(
                 messageType: .lightweightProfile,
                 exchangeId: sid,
-                payload: pay
+                payload: pay,
+                expiresAt: expiresAt
             )
             let b64 = data.base64EncodedString()
             payloadSummary = "セッション \(String(sid.uuidString.prefix(8)))…"
             qrImage = QRCodeGenerator.makeImage(from: b64, dimension: 240)
             if qrImage == nil {
-                errorMessage = "QR を生成できません（データが長すぎる可能性があります）"
+                errorMessage =
+                    "QR を生成できません。プロフィールやアイコンのデータ量が大きすぎる可能性があります。プロフィール編集で画像を小さくするか、項目を減らしてください。"
             }
         } catch {
-            errorMessage = error.localizedDescription
+            errorMessage = (error as? LocalizedError)?.errorDescription ?? error.localizedDescription
         }
     }
 
@@ -65,7 +81,7 @@ final class QRExchangeViewModel: ObservableObject {
         scanSuccessMessage = nil
         let trimmed = b64.trimmingCharacters(in: .whitespacesAndNewlines)
         guard let raw = Data(base64Encoded: trimmed) else {
-            errorMessage = "無効なQRコードです"
+            errorMessage = "読み取ったコードが CosCard の交換用データではありません"
             return
         }
         do {
@@ -74,11 +90,19 @@ final class QRExchangeViewModel: ObservableObject {
                 errorMessage = "交換用のプロフィールではありません"
                 return
             }
-            let dec = JSONDecoder()
-            dec.dateDecodingStrategy = .iso8601
-            let p = try dec.decode(LightweightProfilePayload.self, from: envelope.payload)
+            if scannedExchangeIds.contains(envelope.exchangeId) {
+                errorMessage = "この QR は直前に読み取り済みです。別のコードをスキャンしてください。"
+                return
+            }
+            let p = try jsonDecoder.decode(LightweightProfilePayload.self, from: envelope.payload)
+            try await ProfileValidation.validateIncomingExchange(
+                envelope: envelope,
+                ephemeralToken: p.ephemeralToken,
+                tokenRepository: env.tokenRepository
+            )
             let peer = LightweightProfile(
                 ephemeralToken: p.ephemeralToken,
+                publicProfileId: p.publicProfileId,
                 displayName: p.displayName,
                 bioShort: p.bioShort,
                 primarySNSLabel: p.primarySNSLabel,
@@ -92,21 +116,47 @@ final class QRExchangeViewModel: ObservableObject {
                 peerPreviewName: p.displayName,
                 peerPreviewIcon: p.iconThumbnailData
             )
-            let uc = SaveExchangeResultUseCase(
-                peerRepository: env.peerRepository,
-                exchangeSessionRepository: env.exchangeSessionRepository,
-                tokenRepository: env.tokenRepository
-            )
+            scannedProfile = peer
+            scannedSessionId = envelope.exchangeId
+            scannedExchangeIds.insert(envelope.exchangeId)
+            pendingScanPeerName = p.displayName
+            showScanComplete = true
+        } catch {
+            errorMessage = (error as? LocalizedError)?.errorDescription ?? error.localizedDescription
+        }
+    }
+
+    func finalizeScan(memo: String?, eventTag: String?) async {
+        guard let env, let profile = scannedProfile, let sid = scannedSessionId else { return }
+        errorMessage = nil
+        let uc = SaveExchangeResultUseCase(
+            peerRepository: env.peerRepository,
+            exchangeSessionRepository: env.exchangeSessionRepository,
+            tokenRepository: env.tokenRepository
+        )
+        do {
             try await uc.execute(
-                sessionId: envelope.exchangeId,
-                peerProfile: peer,
-                memo: nil,
-                eventTag: nil,
+                sessionId: sid,
+                peerProfile: profile,
+                memo: memo,
+                eventTag: eventTag,
                 confirmationCode: nil
             )
-            scanSuccessMessage = "\(p.displayName) を保存しました"
+            scanSuccessMessage = "\(profile.displayName) を保存しました"
+            showScanComplete = false
+            scannedProfile = nil
+            scannedSessionId = nil
         } catch {
-            errorMessage = error.localizedDescription
+            errorMessage = (error as? LocalizedError)?.errorDescription ?? error.localizedDescription
+            showScanComplete = false
+            scannedProfile = nil
+            scannedSessionId = nil
         }
+    }
+
+    func discardPendingScan() {
+        showScanComplete = false
+        scannedProfile = nil
+        scannedSessionId = nil
     }
 }

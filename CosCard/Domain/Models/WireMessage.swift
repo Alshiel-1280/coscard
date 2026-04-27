@@ -64,6 +64,7 @@ struct ApprovalStatePayload: Codable, Sendable {
 
 struct LightweightProfilePayload: Codable, Sendable {
     var ephemeralToken: String
+    var publicProfileId: String?
     var displayName: String
     var bioShort: String?
     var primarySNSLabel: String?

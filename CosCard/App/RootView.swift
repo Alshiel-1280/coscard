@@ -28,10 +28,18 @@ struct RootView: View {
     }
 
     private func loadProfileFlag() async {
-        try? await env.tokenRepository.pruneExpired()
+        do {
+            try await env.tokenRepository.pruneExpired()
+        } catch {
+            AppLogger.error("pruneExpired failed on launch: \(error.localizedDescription)", category: "Launch")
+        }
         let uc = LoadInitialStateUseCase(profileRepository: env.profileRepository)
-        let ok = (try? await uc.execute()) ?? false
-        hasProfile = ok
+        do {
+            hasProfile = try await uc.execute()
+        } catch {
+            AppLogger.error("LoadInitialState failed on launch: \(error.localizedDescription)", category: "Launch")
+            hasProfile = false
+        }
     }
 }
 

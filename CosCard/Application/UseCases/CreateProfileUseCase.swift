@@ -12,6 +12,13 @@ struct CreateProfileUseCase {
     }
 }
 
-enum CreateProfileError: Error {
+enum CreateProfileError: LocalizedError {
     case invalidDisplayName
+
+    var errorDescription: String? {
+        switch self {
+        case .invalidDisplayName:
+            return "表示名は1〜24文字で入力してください"
+        }
+    }
 }

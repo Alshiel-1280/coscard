@@ -1,8 +1,10 @@
 import SwiftUI
+import UIKit
 
 struct QRExchangeView: View {
     @EnvironmentObject private var env: AppEnvironment
     @StateObject private var vm = QRExchangeViewModel()
+    @State private var cameraDenied = false
 
     var body: some View {
         Form {
@@ -19,6 +21,7 @@ struct QRExchangeView: View {
                         .scaledToFit()
                         .frame(maxWidth: 260)
                         .frame(maxWidth: .infinity)
+                        .accessibilityLabel("自分のプロフィール交換用QRコード")
                 } else {
                     Text("「QRを更新」で生成")
                         .foregroundStyle(.secondary)
@@ -34,7 +37,18 @@ struct QRExchangeView: View {
             }
             Section("相手のQRを読み取る") {
                 Button("カメラでスキャン") {
+                    cameraDenied = false
                     vm.showScanner = true
+                }
+                if cameraDenied {
+                    Text("カメラが使えません。設定で CosCard のカメラを許可してください。")
+                        .font(.caption)
+                        .foregroundStyle(AppColors.danger)
+                    Button("設定を開く") {
+                        if let url = URL(string: UIApplication.openSettingsURLString) {
+                            UIApplication.shared.open(url)
+                        }
+                    }
                 }
             }
             if let ok = vm.scanSuccessMessage {
@@ -59,8 +73,25 @@ struct QRExchangeView: View {
                 onScan: { code in
                     Task { await vm.handleScannedBase64(code) }
                 },
-                isPresented: $vm.showScanner
+                isPresented: $vm.showScanner,
+                cameraDenied: $cameraDenied
             )
+        }
+        .sheet(isPresented: $vm.showScanComplete) {
+            NavigationStack {
+                ExchangeCompleteView(peerName: vm.pendingScanPeerName) { memo, tag in
+                    Task {
+                        await vm.finalizeScan(memo: memo, eventTag: tag)
+                    }
+                }
+                .toolbar {
+                    ToolbarItem(placement: .cancellationAction) {
+                        Button("閉じる") {
+                            vm.discardPendingScan()
+                        }
+                    }
+                }
+            }
         }
     }
 }

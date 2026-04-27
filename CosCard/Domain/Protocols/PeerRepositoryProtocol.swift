@@ -11,13 +11,25 @@ struct PeerSummary: Identifiable, Equatable, Sendable {
     var isHidden: Bool
 }
 
+struct PeerExchangeSessionRow: Identifiable, Equatable, Sendable {
+    var id: UUID
+    var startedAt: Date
+    var endedAt: Date?
+    var state: String
+    var result: String?
+    var failureReason: String?
+    var transport: String
+}
+
 struct PeerDetail: Equatable, Sendable {
     var summary: PeerSummary
     var latestSNSLabel: String?
     var latestSNSURL: String?
     var latestIconThumbnailData: Data?
     var firstMetAt: Date
+    var lastMetAt: Date
     var lastEventTag: String?
+    var exchangeSessions: [PeerExchangeSessionRow]
 }
 
 @MainActor

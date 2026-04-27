@@ -25,6 +25,7 @@ final class MPCManager: NSObject, NearbyServiceProtocol {
     private(set) var pendingInvitationExchangeId: UUID?
     var onSessionConnected: (() -> Void)?
     var onPeerDisconnected: (() -> Void)?
+    var onPermissionError: ((String) -> Void)?
     var inviteAutoRejectPredicate: ((String?) -> Bool)?
 
     override init() {
@@ -100,7 +101,7 @@ final class MPCManager: NSObject, NearbyServiceProtocol {
         activeExchangeId = nil
         incomingInvitePreviewName = nil
         handler(false, nil)
-        exchangeState = .idle
+        exchangeState = candidates.isEmpty ? .browsing : .candidateFound
     }
 
     func sendConfirmationCode(_ code: String, exchangeId: UUID) async throws {
@@ -124,6 +125,7 @@ final class MPCManager: NSObject, NearbyServiceProtocol {
     func sendLightweightProfile(_ profile: LightweightProfile, exchangeId: UUID) async throws {
         let payload = LightweightProfilePayload(
             ephemeralToken: profile.ephemeralToken,
+            publicProfileId: profile.publicProfileId,
             displayName: profile.displayName,
             bioShort: profile.bioShort,
             primarySNSLabel: profile.primarySNSLabel,
@@ -131,10 +133,12 @@ final class MPCManager: NSObject, NearbyServiceProtocol {
             profileVersion: profile.profileVersion,
             iconThumbnailData: profile.iconThumbnailData
         )
+        let expiresAt = Date().addingTimeInterval(180)
         try sendToConnectedPeers(
             messageType: .lightweightProfile,
             exchangeId: exchangeId,
-            payload: payload
+            payload: payload,
+            expiresAt: expiresAt
         )
     }
 
@@ -150,11 +154,21 @@ final class MPCManager: NSObject, NearbyServiceProtocol {
         exchangeState = .cancelled
     }
 
-    private func sendToConnectedPeers<P: Encodable>(messageType: WireMessageType, exchangeId: UUID, payload: P) throws {
+    private func sendToConnectedPeers<P: Encodable>(
+        messageType: WireMessageType,
+        exchangeId: UUID,
+        payload: P,
+        expiresAt: Date? = nil
+    ) throws {
         guard let session else { throw CosCardError.sessionMissing }
         let peers = session.connectedPeers
         guard let peer = peers.first else { throw CosCardError.notConnected }
-        let data = try MPCMessageEncoder.encodeEnvelope(messageType: messageType, exchangeId: exchangeId, payload: payload)
+        let data = try MPCMessageEncoder.encodeEnvelope(
+            messageType: messageType,
+            exchangeId: exchangeId,
+            payload: payload,
+            expiresAt: expiresAt
+        )
         try session.send(data, toPeers: [peer], with: .reliable)
     }
 }
@@ -165,6 +179,9 @@ extension MPCManager: MCNearbyServiceAdvertiserDelegate {
     nonisolated func advertiser(_: MCNearbyServiceAdvertiser, didNotStartAdvertisingPeer error: Error) {
         Task { @MainActor in
             AppLogger.log("Advertising failed: \(error.localizedDescription)", category: "MPC")
+            let msg =
+                "近傍の公開に失敗しました。設定 > プライバシーとセキュリティ > ローカルネットワークで CosCard を許可してください。（\(error.localizedDescription)）"
+            self.onPermissionError?(msg)
         }
     }
 
@@ -211,6 +228,9 @@ extension MPCManager: MCNearbyServiceBrowserDelegate {
     nonisolated func browser(_: MCNearbyServiceBrowser, didNotStartBrowsingForPeers error: Error) {
         Task { @MainActor in
             AppLogger.log("Browsing failed: \(error.localizedDescription)", category: "MPC")
+            let msg =
+                "近くの端末の検索に失敗しました。Bluetooth とローカルネットワークの許可を確認してください。（\(error.localizedDescription)）"
+            self.onPermissionError?(msg)
         }
     }
 
@@ -252,6 +272,14 @@ extension MPCManager: MCSessionDelegate {
                 self.onSessionConnected?()
             case .notConnected:
                 self.pendingInvitationHandler = nil
+                if self.exchangeState == .cancelled {
+                    self.activeExchangeId = nil
+                    self.pendingInvitationExchangeId = nil
+                    self.incomingInvitePreviewName = nil
+                    self.isInviteInitiator = false
+                    self.exchangeState = .idle
+                    return
+                }
                 if self.activeExchangeId != nil || self.pendingInvitationExchangeId != nil {
                     self.activeExchangeId = nil
                     self.pendingInvitationExchangeId = nil

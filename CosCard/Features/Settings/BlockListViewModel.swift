@@ -12,12 +12,21 @@ final class BlockListViewModel: ObservableObject {
 
     func load() async {
         guard let env else { return }
-        peers = (try? await env.peerRepository.listBlockedPeers(newestFirst: true)) ?? []
+        do {
+            peers = try await env.peerRepository.listBlockedPeers(newestFirst: true)
+        } catch {
+            AppLogger.log("listBlockedPeers failed: \(error.localizedDescription)", category: "BlockList")
+        }
     }
 
     func unblock(peerId: UUID) async {
         guard let env else { return }
-        try? await env.peerRepository.setBlocked(peerId: peerId, blocked: false)
+        do {
+            try await env.peerRepository.setBlocked(peerId: peerId, blocked: false)
+        } catch {
+            AppLogger.log("unblock failed: \(error.localizedDescription)", category: "BlockList")
+        }
         await load()
+        NotificationCenter.default.post(name: .coscardPeerBlockListDidChange, object: nil)
     }
 }

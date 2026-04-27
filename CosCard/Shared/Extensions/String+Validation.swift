@@ -33,4 +33,20 @@ enum ProfileValidation {
         let t = (s ?? "").trimmedCoscard()
         return snsURLRange.contains(t.count)
     }
+
+    // MARK: - 交換ペイロード（MPC / QR 共通）
+
+    @MainActor
+    static func validateIncomingExchange(
+        envelope: WireEnvelope,
+        ephemeralToken: String,
+        tokenRepository: TokenRepositoryProtocol
+    ) async throws {
+        if let exp = envelope.expiresAt, exp < Date() {
+            throw CosCardError.envelopeExpired
+        }
+        if try await tokenRepository.isTokenAlreadySeen(ephemeralToken) {
+            throw CosCardError.tokenAlreadyUsed
+        }
+    }
 }

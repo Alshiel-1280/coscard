@@ -12,10 +12,9 @@ struct LaunchView: View {
                 ProgressView()
             }
         }
-        .onAppear {
-            DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
-                viewModel.finishLaunch()
-            }
+        .task {
+            try? await Task.sleep(nanoseconds: 300_000_000)
+            viewModel.finishLaunch()
         }
     }
 }

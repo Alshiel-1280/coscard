@@ -1,11 +1,20 @@
 import Foundation
 
-/// ephemeral token / profileVersion / 正規化名 / SNS URL / アイコン hash を SHA-256 し、先頭 40 文字を localPeerKey にする。
+/// 安定した publicProfileId を優先。無い旧ペイロードは表示名・SNS・アイコン hash ベース（ephemeral は含めない）。
 enum LocalPeerKey {
     static func make(from profile: LightweightProfile) -> String {
         let iconHash = Checksum.sha256Hex(of: profile.iconThumbnailData ?? Data())
+        if let pid = profile.publicProfileId?.trimmedCoscard(), !pid.isEmpty {
+            let parts = [
+                "pid",
+                pid,
+                "\(profile.profileVersion)",
+            ]
+            let h = Checksum.sha256Hex(of: parts.joined(separator: "|"))
+            return String(h.prefix(40))
+        }
         let parts = [
-            profile.ephemeralToken,
+            "legacy",
             "\(profile.profileVersion)",
             profile.displayName.normalizedForPeerKey(),
             (profile.primarySNSURL ?? "").normalizedSNSURLForPeerKey(),

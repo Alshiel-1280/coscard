@@ -4,18 +4,24 @@ struct ExchangeModeView: View {
     @EnvironmentObject private var env: AppEnvironment
     @StateObject private var vm = ExchangeViewModel()
 
+    private var isExchangeInProgress: Bool {
+        vm.sessionEntityId != nil && !vm.showExchangeComplete
+    }
+
     var body: some View {
         List {
             Section {
-                Text("状態: \(vm.exchangeState.rawValue)")
+                Text("状態: \(vm.exchangeState.localizedLabel)")
                     .font(.caption)
                     .foregroundStyle(.secondary)
+                    .accessibilityLabel("交換の状態、\(vm.exchangeState.localizedLabel)")
             }
             if let code = vm.confirmationCode {
                 Section("確認コード（双方で一致を確認）") {
                     Text(code)
                         .font(.system(size: 36, weight: .bold, design: .monospaced))
                         .frame(maxWidth: .infinity)
+                        .accessibilityLabel("確認コード、\(code.map(String.init).joined(separator: " "))")
                     Text("目視で同じ4桁であることを確認してから承認してください。")
                         .font(.caption)
                         .foregroundStyle(.secondary)
@@ -34,14 +40,23 @@ struct ExchangeModeView: View {
                     ProgressView("相手のプロフィールを受信中…")
                 }
             }
-            Section("近くの候補") {
-                if vm.candidates.isEmpty {
-                    Text("見つかりません。双方がこの画面を開いてください。")
-                        .foregroundStyle(.secondary)
-                } else {
-                    ForEach(vm.candidates) { c in
-                        NavigationLink(value: c) {
-                            ExchangeCandidateRow(candidate: c)
+            if isExchangeInProgress {
+                Section {
+                    Button("交換をキャンセル", role: .cancel) {
+                        Task { await vm.cancelActiveExchange() }
+                    }
+                }
+            }
+            if !isExchangeInProgress {
+                Section("近くの候補") {
+                    if vm.candidates.isEmpty {
+                        Text("見つかりません。双方がこの画面を開いてください。")
+                            .foregroundStyle(.secondary)
+                    } else {
+                        ForEach(vm.candidates) { c in
+                            NavigationLink(value: c) {
+                                ExchangeCandidateRow(candidate: c)
+                            }
                         }
                     }
                 }
@@ -52,7 +67,12 @@ struct ExchangeModeView: View {
                     .foregroundStyle(.secondary)
             }
             if let err = vm.errorMessage {
-                Section { Text(err).foregroundStyle(AppColors.danger) }
+                Section {
+                    Text(err).foregroundStyle(AppColors.danger)
+                    Button("再試行") {
+                        Task { await vm.retryExchange() }
+                    }
+                }
             }
             Section {
                 NavigationLink("QR で交換（フォールバック）") {
@@ -75,12 +95,13 @@ struct ExchangeModeView: View {
         }
         .sheet(isPresented: $vm.showExchangeComplete) {
             NavigationStack {
-                ExchangeCompleteView(peerName: vm.receivedPeerProfile?.displayName ?? "相手") { memo, tag in
+                ExchangeCompleteView(peerName: vm.receivedPeerProfile?.displayName ?? "相手", peerBio: vm.receivedPeerProfile?.bioShort) { memo, tag in
                     Task {
                         await vm.finalizeExchange(memo: memo, eventTag: tag)
                     }
                 }
             }
+            .interactiveDismissDisabled(true)
         }
         .onAppear {
             vm.attach(env)
@@ -88,6 +109,9 @@ struct ExchangeModeView: View {
         }
         .onDisappear {
             vm.cancelPolling()
+        }
+        .onReceive(NotificationCenter.default.publisher(for: .coscardPeerBlockListDidChange)) { _ in
+            Task { await vm.refreshInviteBlockListAsync() }
         }
     }
 }

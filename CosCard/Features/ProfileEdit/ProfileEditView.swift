@@ -7,16 +7,22 @@ struct ProfileEditView: View {
     @StateObject private var vm = ProfileEditViewModel()
     @Environment(\.dismiss) private var dismiss
     @State private var selectedPhoto: PhotosPickerItem?
+    @State private var isSaving = false
 
     var body: some View {
         Form {
-            Section("ユーザーネーム") {
+            Section {
                 TextField("1〜24文字", text: $vm.displayName)
                     .onChange(of: vm.displayName) { _, new in
                         if new.count > ProfileValidation.displayNameRange.upperBound {
                             vm.displayName = String(new.prefix(ProfileValidation.displayNameRange.upperBound))
                         }
                     }
+            } header: {
+                Text("ユーザーネーム")
+            } footer: {
+                Text("\(vm.displayName.count)/\(ProfileValidation.displayNameRange.upperBound)")
+                    .font(.caption2)
             }
 
             Section("アイコン") {
@@ -35,7 +41,7 @@ struct ProfileEditView: View {
                 }
             }
 
-            Section("作例") {
+            Section {
                 TextField("作品URLや実績など（任意）", text: $vm.workSamples, axis: .vertical)
                     .lineLimit(3 ... 6)
                     .onChange(of: vm.workSamples) { _, new in
@@ -43,10 +49,15 @@ struct ProfileEditView: View {
                             vm.workSamples = String(new.prefix(ProfileValidation.bioRange.upperBound))
                         }
                     }
+            } header: {
+                Text("作例")
+            } footer: {
+                Text("\(vm.workSamples.count)/\(ProfileValidation.bioRange.upperBound)")
+                    .font(.caption2)
             }
 
-            Section("SNSリンク") {
-                TextField("Twitter URL", text: $vm.twitterURL)
+            Section {
+                TextField("https://x.com/username", text: $vm.twitterURL)
                     .textInputAutocapitalization(.never)
                     .keyboardType(.URL)
                     .autocorrectionDisabled()
@@ -55,7 +66,7 @@ struct ProfileEditView: View {
                             vm.twitterURL = String(new.prefix(ProfileValidation.snsURLRange.upperBound))
                         }
                     }
-                TextField("Instagram URL", text: $vm.instagramURL)
+                TextField("https://instagram.com/username", text: $vm.instagramURL)
                     .textInputAutocapitalization(.never)
                     .keyboardType(.URL)
                     .autocorrectionDisabled()
@@ -64,7 +75,7 @@ struct ProfileEditView: View {
                             vm.instagramURL = String(new.prefix(ProfileValidation.snsURLRange.upperBound))
                         }
                     }
-                TextField("TikTok URL", text: $vm.tiktokURL)
+                TextField("https://tiktok.com/@username", text: $vm.tiktokURL)
                     .textInputAutocapitalization(.never)
                     .keyboardType(.URL)
                     .autocorrectionDisabled()
@@ -73,6 +84,11 @@ struct ProfileEditView: View {
                             vm.tiktokURL = String(new.prefix(ProfileValidation.snsURLRange.upperBound))
                         }
                     }
+            } header: {
+                Text("SNSリンク")
+            } footer: {
+                Text("URLを入力すると交換時に相手に共有されます")
+                    .font(.caption2)
             }
 
             if let err = vm.errorMessage {
@@ -80,10 +96,24 @@ struct ProfileEditView: View {
             }
 
             Section {
-                Button("保存") {
-                    Task {
-                        if await vm.save() { dismiss() }
+                if isSaving {
+                    HStack {
+                        ProgressView()
+                        Text("保存中…")
+                            .foregroundStyle(.secondary)
                     }
+                } else {
+                    Button("保存") {
+                        isSaving = true
+                        Task {
+                            if await vm.save() {
+                                dismiss()
+                            } else {
+                                isSaving = false
+                            }
+                        }
+                    }
+                    .disabled(vm.displayName.trimmedCoscard().isEmpty)
                 }
             }
         }

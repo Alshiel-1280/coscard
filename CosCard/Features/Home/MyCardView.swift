@@ -35,9 +35,9 @@ struct MyCardView: View {
                 }
             }
         }
-        .task {
+        .onAppear {
             vm.attach(env)
-            await vm.load()
+            Task { await vm.load() }
         }
     }
 
@@ -56,9 +56,10 @@ struct MyCardView: View {
                         .foregroundStyle(.primary)
                         .padding(.top, AppSpacing.xs)
                 }
-                if !socialLinks(from: p).isEmpty {
+                let links = socialLinks(from: p)
+                if !links.isEmpty {
                     VStack(alignment: .leading, spacing: AppSpacing.xs) {
-                        ForEach(socialLinks(from: p), id: \.label) { item in
+                        ForEach(links, id: \.label) { item in
                             socialLinkRow(label: item.label, urlString: item.url)
                         }
                     }

@@ -21,11 +21,13 @@ struct SaveExchangeResultUseCase {
             memo: memo,
             eventTag: eventTag
         )
-        try await tokenRepository.recordIncomingToken(
+        guard try await tokenRepository.recordIncomingTokenIfNew(
             value: peerProfile.ephemeralToken,
             sessionId: sessionId,
             peerContactId: peerId
-        )
+        ) else {
+            throw CosCardError.tokenAlreadyUsed
+        }
         try await exchangeSessionRepository.completeSession(
             id: sessionId,
             result: "success",

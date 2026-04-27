@@ -30,8 +30,24 @@ targets:
     dependencies:
       - sdk: MultipeerConnectivity.framework
 
+  CosCardTests:
+    type: bundle.unit-test
+    platform: iOS
+    sources:
+      - path: CosCardTests
+    dependencies:
+      - target: CosCard
+    settings:
+      base:
+        GENERATE_INFOPLIST_FILE: YES
+        TEST_HOST: "$(BUILT_PRODUCTS_DIR)/CosCard.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/CosCard"
+        BUNDLE_LOADER: "$(TEST_HOST)"
+
 schemes:
   CosCard:
     build:
       targets:
         CosCard: all
+    test:
+      targets:
+        - CosCardTests

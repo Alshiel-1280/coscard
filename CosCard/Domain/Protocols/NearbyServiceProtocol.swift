@@ -13,6 +13,8 @@ protocol NearbyServiceProtocol: AnyObject {
     var onSessionConnected: (() -> Void)? { get set }
     /// セッション切断時（交換中のみ MPCManager 側で発火）
     var onPeerDisconnected: (() -> Void)? { get set }
+    /// 広告・ブラウズ開始失敗（ローカルネットワーク権限など）
+    var onPermissionError: ((String) -> Void)? { get set }
     /// 招待のプレビュー名がブロック一覧と一致する場合に true を返す（同期）
     var inviteAutoRejectPredicate: ((String?) -> Bool)? { get set }
 

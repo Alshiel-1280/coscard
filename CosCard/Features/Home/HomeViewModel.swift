@@ -13,7 +13,15 @@ final class HomeViewModel: ObservableObject {
     func load() async {
         guard let env else { return }
         let uc = LoadInitialStateUseCase(profileRepository: env.profileRepository)
-        _ = try? await uc.execute()
-        profile = try? await env.profileRepository.fetchCurrentProfile()
+        do {
+            _ = try await uc.execute()
+        } catch {
+            AppLogger.log("LoadInitialState failed: \(error.localizedDescription)", category: "Home")
+        }
+        do {
+            profile = try await env.profileRepository.fetchCurrentProfile()
+        } catch {
+            AppLogger.log("fetchCurrentProfile failed: \(error.localizedDescription)", category: "Home")
+        }
     }
 }

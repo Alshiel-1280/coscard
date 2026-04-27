@@ -19,14 +19,18 @@ final class ProfileEditViewModel: ObservableObject {
 
     func load() async {
         guard let env else { return }
-        if let p = try? await env.profileRepository.fetchCurrentProfile() {
-            displayName = p.displayName
-            workSamples = p.bio ?? ""
-            twitterURL = p.twitterURL ?? ""
-            instagramURL = p.instagramURL ?? ""
-            tiktokURL = p.tiktokURL ?? ""
-            iconThumbnailData = p.iconThumbnailData
-            applyLegacySNSDataIfNeeded(primaryLabel: p.primarySNSLabel, primaryURL: p.primarySNSURL)
+        do {
+            if let p = try await env.profileRepository.fetchCurrentProfile() {
+                displayName = p.displayName
+                workSamples = p.bio ?? ""
+                twitterURL = p.twitterURL ?? ""
+                instagramURL = p.instagramURL ?? ""
+                tiktokURL = p.tiktokURL ?? ""
+                iconThumbnailData = p.iconThumbnailData
+                applyLegacySNSDataIfNeeded(primaryLabel: p.primarySNSLabel, primaryURL: p.primarySNSURL)
+            }
+        } catch {
+            AppLogger.log("fetchCurrentProfile failed: \(error.localizedDescription)", category: "ProfileEdit")
         }
     }
 

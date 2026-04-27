@@ -10,11 +10,12 @@ final class PeerRepository: PeerRepositoryProtocol {
     }
 
     func listPeers(newestFirst: Bool) async throws -> [PeerSummary] {
-        var descriptor = FetchDescriptor<PeerContactEntity>(
+        let descriptor = FetchDescriptor<PeerContactEntity>(
+            predicate: #Predicate { $0.isHidden == false },
             sortBy: [SortDescriptor(\.lastMetAt, order: newestFirst ? .reverse : .forward)]
         )
         let list = try modelContext.fetch(descriptor)
-        return list.filter { !$0.isHidden }.map(mapSummary)
+        return list.map(mapSummary)
     }
 
     func listBlockedPeers(newestFirst: Bool) async throws -> [PeerSummary] {
@@ -32,13 +33,26 @@ final class PeerRepository: PeerRepositoryProtocol {
         )
         descriptor.fetchLimit = 1
         guard let e = try modelContext.fetch(descriptor).first else { return nil }
+        let sessions = e.sessions.sorted { $0.startedAt > $1.startedAt }.map { se in
+            PeerExchangeSessionRow(
+                id: se.id,
+                startedAt: se.startedAt,
+                endedAt: se.endedAt,
+                state: se.state,
+                result: se.result,
+                failureReason: se.failureReason,
+                transport: se.transport
+            )
+        }
         return PeerDetail(
             summary: mapSummary(e),
             latestSNSLabel: e.latestSNSLabel,
             latestSNSURL: e.latestSNSURL,
             latestIconThumbnailData: e.latestIconThumbnailData,
             firstMetAt: e.firstMetAt,
-            lastEventTag: e.lastEventTag
+            lastMetAt: e.lastMetAt,
+            lastEventTag: e.lastEventTag,
+            exchangeSessions: sessions
         )
     }
 
@@ -72,7 +86,7 @@ final class PeerRepository: PeerRepositoryProtocol {
     }
 
     func blockedNormalizedDisplayNames() async throws -> Set<String> {
-        var descriptor = FetchDescriptor<PeerContactEntity>(
+        let descriptor = FetchDescriptor<PeerContactEntity>(
             predicate: #Predicate { $0.isBlocked == true }
         )
         let list = try modelContext.fetch(descriptor)

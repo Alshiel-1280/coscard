@@ -74,40 +74,36 @@ open CosCard.xcodeproj
   2. 双方が同じコードを目視確認し **「確認して承認する」** で `approvalState`。
   3. 双方承認後、短命トークン付き **軽量プロフィール** を送受信。
   4. **完了シート**でメモ・イベントタグを任意入力 → `SaveExchangeResultUseCase` で `LocalPeerKey` 算出、`PeerContact` upsert、`LightweightProfileSnapshot`、`ExchangeSession` 完了。
-- **履歴・詳細**: 一覧、メモ、ブロック / 非表示（データは SwiftData）。
-- **QR 画面**: プレースホルダ（カメラ権限は `Info.plist` に記載済み）。
-- **権限**: `NSLocalNetworkUsageDescription`, `NSBluetoothAlwaysUsageDescription`, `NSCameraUsageDescription`。
+- **履歴・詳細**: 一覧、アイコン・SNS・交換日・イベントタグ・セッション履歴、メモ、ブロック / 非表示（SwiftData）。
+- **QR**: Base64 `WireEnvelope` 生成・スキャン（AVFoundation）、完了シートでメモ/タグ入力、トークン・期限検証、カメラ拒否時の案内。
+- **安定プロフィール ID**: `publicProfileId`（初回 `ensurePublicProfileId` で永続化）と `LocalPeerKey` の整理。
+- **権限**: `NSLocalNetworkUsageDescription`, `NSBluetoothAlwaysUsageDescription`, `NSCameraUsageDescription`, **`NSBonjourServices`**: `_coscard._tcp`（近傍探索用）。
 
-### 粗い / 未実装（コード内 `TODO` 参照）
+### 粗い / 今後（コード内 `TODO` 参照）
 
-- 切断・タイムアウト・キャンセルの UI と state 復帰。
-- ブロック済み相手の招待自動拒否（`isBlockedLocalPeerKey` と MPC の接続）。
-- QR による `WireEnvelope` の受け渡し本実装。
-- `KeychainStore` の SecItem 実装、`schemaVersion` マイグレーション。
-- `ResolveDuplicateExchangeUseCase`、受信トークン検証・発行トークン消費タイミングの整理。
-- `IncomingInviteView` を sheet 化するなどの UX 改善。
+- `InvitePayload` に安定 ID を載せたブロック照合の強化。
+- `ResolveDuplicateExchangeUseCase` のユーザー選択 UX。
+- `KeychainStore` の SecItem 実装、`schemaVersion` マイグレーション本実装。
 
 ---
 
 ## 今後のプラン（優先度の目安）
 
-1. **堅牢性** — 切断・タイムアウト・`cancel` の反映、MPC 再接続方針。
-2. **QR フォールバック** — Vision / AVFoundation、Base64 等でのペイロード受け渡し。
-3. **トークン** — 受信検証、`pruneExpired` の運用、発行トークン消費の整理。
-4. **招待 UI** — `IncomingInviteView` のモーダル化、必要なら招待 handler の遅延。
-5. **ブロック連携** — 招待時にローカルキー照合で拒否。
-6. **Keychain** — 長期シークレットが必要になった段階で実装。
-7. **重複交換** — `ResolveDuplicateExchangeUseCase` の UX。
+1. **招待ワイヤ拡張** — `publicProfileId` とブロックリストの照合（表示名以外）。
+2. **重複交換 UX** — `ResolveDuplicateExchangeUseCase` で更新/スキップの選択。
+3. **Keychain** — 長期シークレットが必要になった段階で実装。
+4. **QR 画像** — サムネイル載せる場合のペイロードサイズ上限と圧縮。
 
-（[`docs/IMPLEMENTATION_STATUS.md`](docs/IMPLEMENTATION_STATUS.md) に表形式の TODO あり。）
+（[`docs/IMPLEMENTATION_STATUS.md`](docs/IMPLEMENTATION_STATUS.md) に詳細あり。）
 
 ---
 
-## ビルド
+## ビルド・テスト
 
 ```bash
 xcodegen generate
-xcodebuild -scheme CosCard -destination 'platform=iOS Simulator,name=iPhone 16' build
+xcodebuild -scheme CosCard -destination 'platform=iOS Simulator,name=iPhone 17' build
+xcodebuild -scheme CosCard -destination 'platform=iOS Simulator,name=iPhone 17' test -only-testing:CosCardTests
 ```
 
 - **Simulator 名**は環境に合わせて変更（`xcrun simctl list devices`）。

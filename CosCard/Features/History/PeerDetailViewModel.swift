@@ -12,24 +12,41 @@ final class PeerDetailViewModel: ObservableObject {
 
     func load(peerId: UUID) async {
         guard let env else { return }
-        detail = try? await env.peerRepository.fetchPeer(id: peerId)
+        do {
+            detail = try await env.peerRepository.fetchPeer(id: peerId)
+        } catch {
+            AppLogger.log("fetchPeer failed: \(error.localizedDescription)", category: "PeerDetail")
+        }
     }
 
     func saveMemo(_ text: String) async {
         guard let env, let id = detail?.summary.id else { return }
-        try? await env.peerRepository.updateMemo(peerId: id, memo: text.isEmpty ? nil : text)
+        do {
+            try await env.peerRepository.updateMemo(peerId: id, memo: text.isEmpty ? nil : text)
+        } catch {
+            AppLogger.log("updateMemo failed: \(error.localizedDescription)", category: "PeerDetail")
+        }
         await load(peerId: id)
     }
 
     func toggleBlock() async {
         guard let env, let d = detail else { return }
-        try? await env.peerRepository.setBlocked(peerId: d.summary.id, blocked: !d.summary.isBlocked)
+        do {
+            try await env.peerRepository.setBlocked(peerId: d.summary.id, blocked: !d.summary.isBlocked)
+        } catch {
+            AppLogger.log("setBlocked failed: \(error.localizedDescription)", category: "PeerDetail")
+        }
         await load(peerId: d.summary.id)
+        NotificationCenter.default.post(name: .coscardPeerBlockListDidChange, object: nil)
     }
 
     func toggleHidden() async {
         guard let env, let d = detail else { return }
-        try? await env.peerRepository.setHidden(peerId: d.summary.id, hidden: !d.summary.isHidden)
+        do {
+            try await env.peerRepository.setHidden(peerId: d.summary.id, hidden: !d.summary.isHidden)
+        } catch {
+            AppLogger.log("setHidden failed: \(error.localizedDescription)", category: "PeerDetail")
+        }
         await load(peerId: d.summary.id)
     }
 }

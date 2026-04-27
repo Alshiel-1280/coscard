@@ -31,13 +31,15 @@ enum MPCMessageEncoder {
         expiresAt: Date? = nil
     ) throws -> Data {
         let payloadData = try encoder.encode(payload)
-        let issuedAt = Date()
+        // ISO8601 の丸めで checksum がずれないよう秒単位に揃える
+        let issuedAt = Self.wireDate(Date())
+        let expiresSnap = expiresAt.map { Self.wireDate($0) }
         let checksum = makeChecksum(
             schemaVersion: WireSchema.currentVersion,
             messageType: messageType,
             exchangeId: exchangeId,
             issuedAt: issuedAt,
-            expiresAt: expiresAt,
+            expiresAt: expiresSnap,
             payload: payloadData
         )
         let transport = WireEnvelopeTransport(
@@ -45,11 +47,15 @@ enum MPCMessageEncoder {
             messageType: messageType,
             exchangeId: exchangeId,
             issuedAt: issuedAt,
-            expiresAt: expiresAt,
+            expiresAt: expiresSnap,
             payloadBase64: payloadData.base64EncodedString(),
             checksum: checksum
         )
         return try encoder.encode(transport)
+    }
+
+    private static func wireDate(_ d: Date) -> Date {
+        Date(timeIntervalSince1970: floor(d.timeIntervalSince1970))
     }
 
     static func decodeEnvelope(_ data: Data) throws -> WireEnvelope {
@@ -103,10 +109,26 @@ enum MPCMessageEncoder {
     }
 }
 
-enum CosCardError: Error {
+enum CosCardError: Error, LocalizedError, Equatable {
     case invalidPayload
     case checksumMismatch
     case notConnected
     case peerNotFound
     case sessionMissing
+    case profileMissing
+    case tokenAlreadyUsed
+    case envelopeExpired
+
+    var errorDescription: String? {
+        switch self {
+        case .invalidPayload: return "データの形式が正しくありません"
+        case .checksumMismatch: return "データが壊れているか改ざんされています"
+        case .notConnected: return "接続されていません"
+        case .peerNotFound: return "相手が見つかりません"
+        case .sessionMissing: return "セッションがありません"
+        case .profileMissing: return "プロフィールがありません"
+        case .tokenAlreadyUsed: return "この交換コードは既に使用済みです"
+        case .envelopeExpired: return "交換データの有効期限が切れています"
+        }
+    }
 }

@@ -15,4 +15,7 @@ protocol ExchangeSessionRepositoryProtocol: AnyObject {
         eventTag: String?,
         peerContactId: UUID?
     ) async throws
+
+    /// 失敗・キャンセル・タイムアウト等。`state` は `.failed` または `.cancelled` を想定。
+    func failSession(id: UUID, state: ExchangeState, failureReason: ExchangeFailureReason?) async throws
 }

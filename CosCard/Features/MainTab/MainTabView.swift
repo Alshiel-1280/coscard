@@ -37,17 +37,12 @@ struct MainTabView: View {
             }
         }
         .task(id: selectedTab) {
-            await syncExchangeMode()
+            await stopExchangeIfNeeded()
         }
     }
 
-    private func syncExchangeMode() async {
-        switch selectedTab {
-        case .exchange:
-            let profile = try? await env.profileRepository.fetchCurrentProfile()
-            let displayName = profile?.displayName ?? "Guest"
-            try? await StartExchangeUseCase(nearby: env.nearby).execute(displayName: displayName)
-        case .myCard, .history:
+    private func stopExchangeIfNeeded() async {
+        if selectedTab != .exchange {
             await StopExchangeUseCase(nearby: env.nearby).execute()
         }
     }

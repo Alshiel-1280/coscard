@@ -1,4 +1,5 @@
 import Foundation
+import UIKit
 
 /// 交換フロー: 接続後に発信側が4桁送信 → 双方承認 → プロフィール送受信 → 完了画面で保存。
 @MainActor
@@ -33,11 +34,13 @@ final class ExchangeViewModel: ObservableObject {
         environment.nearby.onEnvelopeReceived = { [weak self] envelope in
             Task { @MainActor in
                 self?.handleEnvelope(envelope)
+                self?.syncFromNearby()
             }
         }
         environment.nearby.onSessionConnected = { [weak self] in
             Task { @MainActor in
                 self?.onMPCSessionConnected()
+                self?.syncFromNearby()
             }
         }
         environment.nearby.onPeerDisconnected = { [weak self] in
@@ -45,11 +48,29 @@ final class ExchangeViewModel: ObservableObject {
                 self?.handlePeerDisconnected()
             }
         }
+        environment.nearby.onPermissionError = { [weak self] msg in
+            Task { @MainActor in
+                self?.errorMessage = msg
+                self?.syncFromNearby()
+            }
+        }
         Task { await refreshInviteBlockList(environment) }
     }
 
+    /// ブロック一覧変更後に招待拒否プリケートを更新する。
+    func refreshInviteBlockListAsync() async {
+        guard let env else { return }
+        await refreshInviteBlockList(env)
+    }
+
     private func refreshInviteBlockList(_ environment: AppEnvironment) async {
-        let blocked = (try? await environment.peerRepository.blockedNormalizedDisplayNames()) ?? []
+        let blocked: Set<String>
+        do {
+            blocked = try await environment.peerRepository.blockedNormalizedDisplayNames()
+        } catch {
+            AppLogger.error("blockedNormalizedDisplayNames failed: \(error.localizedDescription)", category: "Exchange")
+            blocked = []
+        }
         environment.nearby.inviteAutoRejectPredicate = { preview in
             guard let p = preview?.trimmedCoscard(), !p.isEmpty else { return false }
             return blocked.contains(p.normalizedForPeerKey())
@@ -77,7 +98,13 @@ final class ExchangeViewModel: ObservableObject {
         guard let env else { return }
         errorMessage = nil
         resetExchangeFlow()
-        let profile = try? await env.profileRepository.fetchCurrentProfile()
+        let profile: ProfileSummary?
+        do {
+            profile = try await env.profileRepository.fetchCurrentProfile()
+        } catch {
+            AppLogger.log("fetchCurrentProfile failed in startExchange: \(error.localizedDescription)", category: "Exchange")
+            profile = nil
+        }
         let name = profile?.displayName ?? "Guest"
         let uc = StartExchangeUseCase(nearby: env.nearby)
         do {
@@ -93,16 +120,59 @@ final class ExchangeViewModel: ObservableObject {
         pollTask?.cancel()
         pollTask = nil
         guard let env else { return }
+        if let sid = sessionEntityId {
+            do {
+                try await env.nearby.cancel(reason: "user_stop")
+            } catch {
+                AppLogger.log("cancel failed in stopExchange: \(error.localizedDescription)", category: "Exchange")
+            }
+            do {
+                try await env.exchangeSessionRepository.failSession(
+                    id: sid,
+                    state: .cancelled,
+                    failureReason: .cancelledByUser
+                )
+            } catch {
+                AppLogger.log("failSession failed in stopExchange: \(error.localizedDescription)", category: "Exchange")
+            }
+        }
+        resetExchangeFlow()
         await StopExchangeUseCase(nearby: env.nearby).execute()
+        syncFromNearby()
+    }
+
+    /// 交換途中のキャンセル（探索は継続）。
+    func cancelActiveExchange() async {
+        guard let env, let sid = sessionEntityId else { return }
+        errorMessage = nil
+        do {
+            try await env.nearby.cancel(reason: "user")
+        } catch {
+            AppLogger.log("cancel failed in cancelActiveExchange: \(error.localizedDescription)", category: "Exchange")
+        }
+        do {
+            try await env.exchangeSessionRepository.failSession(
+                id: sid,
+                state: .cancelled,
+                failureReason: .cancelledByUser
+            )
+        } catch {
+            AppLogger.log("failSession failed in cancelActiveExchange: \(error.localizedDescription)", category: "Exchange")
+        }
         resetExchangeFlow()
         syncFromNearby()
+    }
+
+    func retryExchange() async {
+        errorMessage = nil
+        await startExchange()
     }
 
     private func startPolling() {
         pollTask?.cancel()
         pollTask = Task { [weak self] in
             while !Task.isCancelled {
-                try? await Task.sleep(nanoseconds: 500_000_000)
+                try? await Task.sleep(nanoseconds: 2_000_000_000)
                 await MainActor.run { self?.syncFromNearby() }
             }
         }
@@ -111,9 +181,13 @@ final class ExchangeViewModel: ObservableObject {
     func syncFromNearby() {
         guard let env else { return }
         candidates = env.nearby.candidates
+        let prevState = exchangeState
         exchangeState = env.nearby.exchangeState
         incomingPreviewName = env.nearby.incomingInvitePreviewName
         if env.nearby.exchangeState == .invitationReceived, env.nearby.incomingInvitePreviewName != nil, !showExchangeComplete {
+            if prevState != .invitationReceived {
+                UIImpactFeedbackGenerator(style: .medium).impactOccurred()
+            }
             showIncomingInviteSheet = true
         }
     }
@@ -123,7 +197,13 @@ final class ExchangeViewModel: ObservableObject {
         errorMessage = nil
         let exchangeId = UUID()
         sessionEntityId = exchangeId
-        let profile = try? await env.profileRepository.fetchCurrentProfile()
+        let profile: ProfileSummary?
+        do {
+            profile = try await env.profileRepository.fetchCurrentProfile()
+        } catch {
+            AppLogger.log("fetchCurrentProfile failed in sendInvite: \(error.localizedDescription)", category: "Exchange")
+            profile = nil
+        }
         do {
             try await env.exchangeSessionRepository.createSession(
                 id: exchangeId,
@@ -237,10 +317,24 @@ final class ExchangeViewModel: ObservableObject {
     private func handlePeerDisconnected() {
         exchangeTimeoutTask?.cancel()
         exchangeTimeoutTask = nil
-        guard sessionEntityId != nil else { return }
-        errorMessage = "接続が切断されました"
-        resetExchangeFlow()
-        syncFromNearby()
+        guard let sid = sessionEntityId else { return }
+        UINotificationFeedbackGenerator().notificationOccurred(.error)
+        Task {
+            do {
+                try await env?.exchangeSessionRepository.failSession(
+                    id: sid,
+                    state: .failed,
+                    failureReason: .disconnected
+                )
+            } catch {
+                AppLogger.error("failSession failed in handlePeerDisconnected: \(error.localizedDescription)", category: "Exchange")
+            }
+            await MainActor.run {
+                self.errorMessage = "接続が切断されました"
+                self.resetExchangeFlow()
+                self.syncFromNearby()
+            }
+        }
     }
 
     private func scheduleExchangeTimeout() {
@@ -249,12 +343,29 @@ final class ExchangeViewModel: ObservableObject {
             try? await Task.sleep(nanoseconds: 60_000_000_000)
             await MainActor.run {
                 guard let self else { return }
-                guard self.sessionEntityId != nil else { return }
+                guard let sid = self.sessionEntityId else { return }
                 guard !self.showExchangeComplete else { return }
                 self.errorMessage = "交換がタイムアウトしました"
-                self.resetExchangeFlow()
-                Task { try? await self.env?.nearby.cancel(reason: "timeout") }
-                self.syncFromNearby()
+                Task {
+                    do {
+                        try await self.env?.nearby.cancel(reason: "timeout")
+                    } catch {
+                        AppLogger.error("cancel failed in timeout: \(error.localizedDescription)", category: "Exchange")
+                    }
+                    do {
+                        try await self.env?.exchangeSessionRepository.failSession(
+                            id: sid,
+                            state: .failed,
+                            failureReason: .timeout
+                        )
+                    } catch {
+                        AppLogger.error("failSession failed in timeout: \(error.localizedDescription)", category: "Exchange")
+                    }
+                    await MainActor.run {
+                        self.resetExchangeFlow()
+                        self.syncFromNearby()
+                    }
+                }
             }
         }
     }
@@ -285,19 +396,45 @@ final class ExchangeViewModel: ObservableObject {
                 }
             case .lightweightProfile:
                 let p = try jsonDecoder.decode(LightweightProfilePayload.self, from: envelope.payload)
-                receivedPeerProfile = LightweightProfile(
-                    ephemeralToken: p.ephemeralToken,
-                    displayName: p.displayName,
-                    bioShort: p.bioShort,
-                    primarySNSLabel: p.primarySNSLabel,
-                    primarySNSURL: p.primarySNSURL,
-                    profileVersion: p.profileVersion,
-                    iconThumbnailData: p.iconThumbnailData
-                )
-                checkReadyForComplete()
+                guard let env else { break }
+                Task { @MainActor in
+                    do {
+                        try await ProfileValidation.validateIncomingExchange(
+                            envelope: envelope,
+                            ephemeralToken: p.ephemeralToken,
+                            tokenRepository: env.tokenRepository
+                        )
+                        self.receivedPeerProfile = LightweightProfile(
+                            ephemeralToken: p.ephemeralToken,
+                            publicProfileId: p.publicProfileId,
+                            displayName: p.displayName,
+                            bioShort: p.bioShort,
+                            primarySNSLabel: p.primarySNSLabel,
+                            primarySNSURL: p.primarySNSURL,
+                            profileVersion: p.profileVersion,
+                            iconThumbnailData: p.iconThumbnailData
+                        )
+                        self.checkReadyForComplete()
+                    } catch {
+                        self.errorMessage = (error as? LocalizedError)?.errorDescription ?? error.localizedDescription
+                    }
+                }
             case .cancel:
+                let failSid = sid
                 errorMessage = "相手がキャンセルしました"
-                resetExchangeFlow()
+                Task { @MainActor in
+                    do {
+                        try await self.env?.exchangeSessionRepository.failSession(
+                            id: failSid,
+                            state: .cancelled,
+                            failureReason: .peerRejected
+                        )
+                    } catch {
+                        AppLogger.error("failSession failed on peer cancel: \(error.localizedDescription)", category: "Exchange")
+                    }
+                    self.resetExchangeFlow()
+                    self.syncFromNearby()
+                }
             default:
                 break
             }
@@ -328,9 +465,11 @@ final class ExchangeViewModel: ObservableObject {
             }
             let token = try await GenerateEphemeralTokenUseCase(tokenRepository: env.tokenRepository)
                 .execute(sessionId: exchangeId)
+            let publicId = try await env.profileRepository.ensurePublicProfileId()
             let thumb = profile.iconThumbnailData
             let light = LightweightProfile(
                 ephemeralToken: token,
+                publicProfileId: publicId,
                 displayName: profile.displayName,
                 bioShort: profile.bio,
                 primarySNSLabel: profile.primarySNSLabel,
@@ -353,6 +492,7 @@ final class ExchangeViewModel: ObservableObject {
         showExchangeComplete = true
         exchangeTimeoutTask?.cancel()
         exchangeTimeoutTask = nil
+        UINotificationFeedbackGenerator().notificationOccurred(.success)
         Task {
             try? await env?.exchangeSessionRepository.updateSessionState(id: sid, state: .saving)
         }

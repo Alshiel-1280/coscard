@@ -16,6 +16,8 @@ final class UserProfileEntity {
     @Attribute(.externalStorage) var iconThumbnailData: Data?
     var visibilityLevel: String
     var profileVersion: Int
+    /// 交換ペイロード用の安定 ID（初回アクセスで生成・永続化）
+    var publicProfileId: String?
     var createdAt: Date
     var updatedAt: Date
 
@@ -33,6 +35,7 @@ final class UserProfileEntity {
         iconThumbnailData: Data? = nil,
         visibilityLevel: String = "public",
         profileVersion: Int = 1,
+        publicProfileId: String? = nil,
         createdAt: Date = .now,
         updatedAt: Date = .now
     ) {
@@ -49,6 +52,7 @@ final class UserProfileEntity {
         self.iconThumbnailData = iconThumbnailData
         self.visibilityLevel = visibilityLevel
         self.profileVersion = profileVersion
+        self.publicProfileId = publicProfileId
         self.createdAt = createdAt
         self.updatedAt = updatedAt
     }

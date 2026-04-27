@@ -12,6 +12,10 @@ final class HistoryListViewModel: ObservableObject {
 
     func load() async {
         guard let env else { return }
-        peers = (try? await env.peerRepository.listPeers(newestFirst: true)) ?? []
+        do {
+            peers = try await env.peerRepository.listPeers(newestFirst: true)
+        } catch {
+            AppLogger.log("listPeers failed: \(error.localizedDescription)", category: "History")
+        }
     }
 }

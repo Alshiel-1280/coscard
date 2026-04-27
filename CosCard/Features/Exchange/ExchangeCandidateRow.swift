@@ -34,6 +34,8 @@ struct ExchangeCandidateRow: View {
             }
         }
         .padding(.vertical, 4)
+        .accessibilityElement(children: .combine)
+        .accessibilityLabel(candidate.previewDisplayName)
     }
 }
 

@@ -17,6 +17,22 @@ final class ProfileRepository: ProfileRepositoryProtocol {
         return map(e)
     }
 
+    func ensurePublicProfileId() async throws -> String {
+        var descriptor = FetchDescriptor<UserProfileEntity>()
+        descriptor.fetchLimit = 1
+        guard let e = try modelContext.fetch(descriptor).first else {
+            throw CosCardError.profileMissing
+        }
+        if let existing = e.publicProfileId, !existing.isEmpty {
+            return existing
+        }
+        let newId = UUID().uuidString
+        e.publicProfileId = newId
+        e.updatedAt = .now
+        try modelContext.save()
+        return newId
+    }
+
     func upsertProfile(_ draft: ProfileDraft) async throws -> ProfileSummary {
         var descriptor = FetchDescriptor<UserProfileEntity>()
         descriptor.fetchLimit = 1
@@ -66,6 +82,7 @@ final class ProfileRepository: ProfileRepositoryProtocol {
             tiktokURL: e.tiktokURL,
             iconThumbnailData: e.iconThumbnailData,
             profileVersion: e.profileVersion,
+            publicProfileId: e.publicProfileId,
             updatedAt: e.updatedAt
         )
     }
