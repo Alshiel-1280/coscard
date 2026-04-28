@@ -20,6 +20,7 @@ final class ExchangeViewModel: ObservableObject {
     @Published var showExchangeComplete = false
     /// 自分のプロフィール送信が完了したか（UI 用）
     @Published private(set) var hasSentMyProfile = false
+    @Published private(set) var peerAcknowledgedMyProfile = false
 
     private var env: AppEnvironment?
     private var pollTask: Task<Void, Never>?
@@ -329,6 +330,11 @@ final class ExchangeViewModel: ObservableObject {
     }
 
     private func handlePeerDisconnected() {
+        if showExchangeComplete || (hasSentMyProfile && receivedPeerProfile != nil && peerAcknowledgedMyProfile) {
+            exchangeTimeoutTask?.cancel()
+            exchangeTimeoutTask = nil
+            return
+        }
         exchangeTimeoutTask?.cancel()
         exchangeTimeoutTask = nil
         guard let sid = sessionEntityId else { return }
@@ -434,11 +440,16 @@ final class ExchangeViewModel: ObservableObject {
                         )
                         self.receivedPeerProfile = peerProfile
                         self.receivedPeerIsDuplicate = duplicateCheck.isDuplicate
+                        try await env.nearby.sendAck(exchangeId: sid, message: "profile_received")
                         self.checkReadyForComplete()
                     } catch {
                         self.errorMessage = (error as? LocalizedError)?.errorDescription ?? error.localizedDescription
                     }
                 }
+            case .ack:
+                _ = try jsonDecoder.decode(AckPayload.self, from: envelope.payload)
+                peerAcknowledgedMyProfile = true
+                checkReadyForComplete()
             case .cancel:
                 let failSid = sid
                 errorMessage = "相手がキャンセルしました"
@@ -507,13 +518,14 @@ final class ExchangeViewModel: ObservableObject {
     }
 
     private func checkReadyForComplete() {
-        guard hasSentMyProfile, receivedPeerProfile != nil else { return }
+        guard hasSentMyProfile, receivedPeerProfile != nil, peerAcknowledgedMyProfile else { return }
         guard let sid = sessionEntityId else { return }
         showExchangeComplete = true
         exchangeTimeoutTask?.cancel()
         exchangeTimeoutTask = nil
         UINotificationFeedbackGenerator().notificationOccurred(.success)
         Task {
+            await env?.nearby.markExchangeReadyForSave(exchangeId: sid)
             try? await env?.exchangeSessionRepository.updateSessionState(id: sid, state: .saving)
         }
     }
@@ -526,6 +538,7 @@ final class ExchangeViewModel: ObservableObject {
         localUserApproved = false
         peerHasApproved = false
         hasSentMyProfile = false
+        peerAcknowledgedMyProfile = false
         receivedPeerProfile = nil
         receivedPeerIsDuplicate = false
         showExchangeComplete = false

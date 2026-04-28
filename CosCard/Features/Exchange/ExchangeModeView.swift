@@ -40,6 +40,11 @@ struct ExchangeModeView: View {
                     ProgressView("相手のプロフィールを受信中…")
                 }
             }
+            if vm.hasSentMyProfile, vm.receivedPeerProfile != nil, !vm.peerAcknowledgedMyProfile {
+                Section {
+                    ProgressView("相手の受信確認を待っています…")
+                }
+            }
             if isExchangeInProgress {
                 Section {
                     Button("交換をキャンセル", role: .cancel) {

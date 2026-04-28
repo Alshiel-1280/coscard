@@ -34,6 +34,9 @@ protocol NearbyServiceProtocol: AnyObject {
     func sendConfirmationCode(_ code: String, exchangeId: UUID) async throws
     func sendApproval(approved: Bool, exchangeId: UUID) async throws
     func sendLightweightProfile(_ profile: LightweightProfile, exchangeId: UUID) async throws
+    func sendAck(exchangeId: UUID, message: String?) async throws
+    /// プロフィール送受信が UI 的に完了し、以後の切断を交換失敗として扱わない。
+    func markExchangeReadyForSave(exchangeId: UUID) async
     func cancel(reason: String?) async throws
 
     var onEnvelopeReceived: ((WireEnvelope) -> Void)? { get set }

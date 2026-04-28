@@ -6,6 +6,7 @@ import MultipeerConnectivity
 final class MPCManager: NSObject, NearbyServiceProtocol {
     private static let serviceType = "coscard"
     private static let discoveryPreviewNameKey = "previewName"
+    private static let localPeerIDDefaultsKey = "coscard.mpc.localPeerID"
 
     private var myPeerID: MCPeerID?
     private var session: MCSession?
@@ -14,6 +15,7 @@ final class MPCManager: NSObject, NearbyServiceProtocol {
 
     private var peerByKey: [String: MCPeerID] = [:]
     private var pendingInvitationHandler: ((Bool, MCSession?) -> Void)?
+    private var connectedPeer: MCPeerID?
 
     private(set) var exchangeState: ExchangeState = .idle
     private(set) var candidates: [PeerCandidate] = []
@@ -35,7 +37,7 @@ final class MPCManager: NSObject, NearbyServiceProtocol {
     func startAdvertisingAndBrowsing(displayName: String) async throws {
         stopInternals()
         let trimmed = displayName.trimmedCoscard()
-        let peer = MCPeerID(displayName: String(trimmed.prefix(63)))
+        let peer = MCPeerID(displayName: Self.makeLocalPeerDisplayName())
         myPeerID = peer
         let sess = MCSession(peer: peer, securityIdentity: nil, encryptionPreference: .required)
         sess.delegate = self
@@ -60,6 +62,7 @@ final class MPCManager: NSObject, NearbyServiceProtocol {
     private func stopInternals() {
         advertiser?.stopAdvertisingPeer()
         browser?.stopBrowsingForPeers()
+        pendingInvitationHandler?(false, nil)
         advertiser = nil
         browser = nil
         session?.disconnect()
@@ -68,6 +71,7 @@ final class MPCManager: NSObject, NearbyServiceProtocol {
         peerByKey.removeAll()
         candidates.removeAll()
         pendingInvitationHandler = nil
+        connectedPeer = nil
         incomingInvitePreviewName = nil
         activeExchangeId = nil
         isInviteInitiator = false
@@ -152,6 +156,15 @@ final class MPCManager: NSObject, NearbyServiceProtocol {
         )
     }
 
+    func sendAck(exchangeId: UUID, message: String?) async throws {
+        let payload = AckPayload(receivedAt: .now, message: message)
+        try sendToConnectedPeers(
+            messageType: .ack,
+            exchangeId: exchangeId,
+            payload: payload
+        )
+    }
+
     func cancel(reason: String?) async throws {
         guard let session else { return }
         let peers = session.connectedPeers
@@ -161,7 +174,18 @@ final class MPCManager: NSObject, NearbyServiceProtocol {
             try session.send(data, toPeers: peers, with: .reliable)
         }
         session.disconnect()
+        connectedPeer = nil
         exchangeState = .cancelled
+    }
+
+    func markExchangeReadyForSave(exchangeId: UUID) async {
+        guard activeExchangeId == exchangeId || pendingInvitationExchangeId == exchangeId else { return }
+        activeExchangeId = nil
+        pendingInvitationExchangeId = nil
+        incomingInvitePreviewName = nil
+        isInviteInitiator = false
+        connectedPeer = nil
+        exchangeState = candidates.isEmpty ? .browsing : .candidateFound
     }
 
     private func sendToConnectedPeers<P: Encodable>(
@@ -172,7 +196,14 @@ final class MPCManager: NSObject, NearbyServiceProtocol {
     ) throws {
         guard let session else { throw CosCardError.sessionMissing }
         let peers = session.connectedPeers
-        guard let peer = peers.first else { throw CosCardError.notConnected }
+        let peer: MCPeerID?
+        if let connectedPeer, peers.contains(connectedPeer) {
+            peer = connectedPeer
+        } else {
+            peer = peers.first
+            connectedPeer = peer
+        }
+        guard let peer else { throw CosCardError.notConnected }
         let data = try MPCMessageEncoder.encodeEnvelope(
             messageType: messageType,
             exchangeId: exchangeId,
@@ -180,6 +211,20 @@ final class MPCManager: NSObject, NearbyServiceProtocol {
             expiresAt: expiresAt
         )
         try session.send(data, toPeers: [peer], with: .reliable)
+    }
+
+    private static func makeLocalPeerDisplayName() -> String {
+        let defaults = UserDefaults.standard
+        if let saved = defaults.string(forKey: localPeerIDDefaultsKey), !saved.isEmpty {
+            return "CosCard-\(saved)"
+        }
+        let generated = UUID().uuidString
+            .replacingOccurrences(of: "-", with: "")
+            .lowercased()
+            .prefix(12)
+        let id = String(generated)
+        defaults.set(id, forKey: localPeerIDDefaultsKey)
+        return "CosCard-\(id)"
     }
 }
 
@@ -259,6 +304,7 @@ extension MPCManager: MCNearbyServiceBrowserDelegate {
 
     nonisolated func browser(_: MCNearbyServiceBrowser, foundPeer peerID: MCPeerID, withDiscoveryInfo info: [String: String]?) {
         Task { @MainActor in
+            guard peerID != self.myPeerID else { return }
             let key = MPCPeerHandle.candidateKey(for: peerID)
             self.peerByKey[key] = peerID
             let preview = info?[Self.discoveryPreviewNameKey] ?? peerID.displayName
@@ -278,6 +324,7 @@ extension MPCManager: MCNearbyServiceBrowserDelegate {
 
     nonisolated func browser(_: MCNearbyServiceBrowser, lostPeer peerID: MCPeerID) {
         Task { @MainActor in
+            guard peerID != self.myPeerID else { return }
             let key = MPCPeerHandle.candidateKey(for: peerID)
             self.peerByKey.removeValue(forKey: key)
             self.candidates.removeAll { $0.mpcPeerId == key }
@@ -288,13 +335,18 @@ extension MPCManager: MCNearbyServiceBrowserDelegate {
 // MARK: - MCSessionDelegate
 
 extension MPCManager: MCSessionDelegate {
-    nonisolated func session(_: MCSession, peer _: MCPeerID, didChange state: MCSessionState) {
+    nonisolated func session(_ callbackSession: MCSession, peer peerID: MCPeerID, didChange state: MCSessionState) {
         Task { @MainActor in
+            guard self.session === callbackSession else { return }
             switch state {
             case .connected:
+                self.connectedPeer = peerID
                 self.onSessionConnected?()
             case .notConnected:
                 self.pendingInvitationHandler = nil
+                if self.connectedPeer == peerID {
+                    self.connectedPeer = nil
+                }
                 if self.exchangeState == .cancelled {
                     self.activeExchangeId = nil
                     self.pendingInvitationExchangeId = nil
@@ -317,8 +369,9 @@ extension MPCManager: MCSessionDelegate {
         }
     }
 
-    nonisolated func session(_: MCSession, didReceive data: Data, fromPeer _: MCPeerID) {
+    nonisolated func session(_ callbackSession: MCSession, didReceive data: Data, fromPeer _: MCPeerID) {
         Task { @MainActor in
+            guard self.session === callbackSession else { return }
             guard let env = try? MPCMessageEncoder.decodeEnvelope(data) else { return }
             self.onEnvelopeReceived?(env)
         }
