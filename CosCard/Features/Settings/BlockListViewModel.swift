@@ -3,6 +3,19 @@ import Foundation
 @MainActor
 final class BlockListViewModel: ObservableObject {
     @Published private(set) var peers: [PeerSummary] = []
+    @Published var searchText = ""
+
+    var filteredPeers: [PeerSummary] {
+        let query = searchText.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !query.isEmpty else { return peers }
+
+        return peers.filter { peer in
+            peer.latestDisplayName.localizedCaseInsensitiveContains(query)
+                || peer.localPeerKey.localizedCaseInsensitiveContains(query)
+                || (peer.publicProfileId?.localizedCaseInsensitiveContains(query) ?? false)
+                || (peer.memo?.localizedCaseInsensitiveContains(query) ?? false)
+        }
+    }
 
     private var env: AppEnvironment?
 

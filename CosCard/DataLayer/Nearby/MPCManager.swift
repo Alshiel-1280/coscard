@@ -26,7 +26,7 @@ final class MPCManager: NSObject, NearbyServiceProtocol {
     var onSessionConnected: (() -> Void)?
     var onPeerDisconnected: (() -> Void)?
     var onPermissionError: ((String) -> Void)?
-    var inviteAutoRejectPredicate: ((String?) -> Bool)?
+    var inviteAutoRejectPredicate: ((String?, String?) -> Bool)?
 
     override init() {
         super.init()
@@ -75,12 +75,22 @@ final class MPCManager: NSObject, NearbyServiceProtocol {
         exchangeState = .idle
     }
 
-    func sendInvite(to candidate: PeerCandidate, previewName: String, previewIcon: Data?, exchangeId: UUID) async throws {
+    func sendInvite(
+        to candidate: PeerCandidate,
+        previewName: String,
+        previewIcon: Data?,
+        publicProfileId: String?,
+        exchangeId: UUID
+    ) async throws {
         guard let browser, let session else { throw CosCardError.sessionMissing }
         guard let peer = peerByKey[candidate.mpcPeerId] else { throw CosCardError.peerNotFound }
         activeExchangeId = exchangeId
         isInviteInitiator = true
-        let payload = InvitePayload(requesterPreviewName: previewName, requesterPreviewIconData: previewIcon)
+        let payload = InvitePayload(
+            requesterPreviewName: previewName,
+            requesterPreviewIconData: previewIcon,
+            publicProfileId: publicProfileId
+        )
         let ctx = try MPCMessageEncoder.encodeEnvelope(messageType: .invite, exchangeId: exchangeId, payload: payload)
         browser.invitePeer(peer, to: session, withContext: ctx, timeout: 60)
         exchangeState = .invitationSent
@@ -200,16 +210,29 @@ extension MPCManager: MCNearbyServiceAdvertiserDelegate {
                 invitationHandler(false, nil)
                 return
             }
+            guard wireEnv.messageType == .invite else {
+                invitationHandler(false, nil)
+                AppLogger.log("Invite rejected: unexpected message type \(wireEnv.messageType.rawValue)", category: "MPC")
+                return
+            }
+            if let expiresAt = wireEnv.expiresAt, expiresAt < Date() {
+                invitationHandler(false, nil)
+                AppLogger.log("Invite rejected: expired context", category: "MPC")
+                return
+            }
             let decodedExchangeId = wireEnv.exchangeId
-            var previewName: String?
             let dec = JSONDecoder()
             dec.dateDecodingStrategy = .iso8601
-            if let invite = try? dec.decode(InvitePayload.self, from: wireEnv.payload) {
-                previewName = invite.requesterPreviewName
-            }
-            if self.inviteAutoRejectPredicate?(previewName) == true {
+            guard let invite = try? dec.decode(InvitePayload.self, from: wireEnv.payload) else {
                 invitationHandler(false, nil)
-                AppLogger.log("Invite auto-rejected (blocked preview name)", category: "MPC")
+                AppLogger.log("Invite rejected: invalid invite payload", category: "MPC")
+                return
+            }
+            let previewName = invite.requesterPreviewName
+            let publicProfileId = invite.publicProfileId
+            if self.inviteAutoRejectPredicate?(previewName, publicProfileId) == true {
+                invitationHandler(false, nil)
+                AppLogger.log("Invite auto-rejected (blocked invite identity)", category: "MPC")
                 return
             }
             self.pendingInvitationHandler = invitationHandler

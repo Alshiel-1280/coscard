@@ -8,9 +8,9 @@ struct HistoryListView: View {
         Group {
             if vm.peers.isEmpty {
                 ContentUnavailableView(
-                    "まだ交換履歴がありません",
-                    systemImage: "person.2.slash",
-                    description: Text("近くの相手とプロフィールを交換すると、ここに記録されます。")
+                    emptyTitle,
+                    systemImage: emptySystemImage,
+                    description: Text(emptyDescription)
                 )
             } else {
                 List {
@@ -28,6 +28,11 @@ struct HistoryListView: View {
                                     Text(p.lastMetAt.coscardShortString())
                                         .font(.caption)
                                         .foregroundStyle(.tertiary)
+                                    if p.isBlocked {
+                                        Label("ブロック中", systemImage: "hand.raised.fill")
+                                            .font(.caption2)
+                                            .foregroundStyle(AppColors.danger)
+                                    }
                                     if let memo = p.memo, !memo.isEmpty {
                                         Text("📝")
                                             .font(.caption2)
@@ -40,13 +45,50 @@ struct HistoryListView: View {
             }
         }
         .navigationTitle("履歴")
+        .searchable(text: $vm.searchText, placement: .navigationBarDrawer(displayMode: .always), prompt: "名前・自己紹介・メモを検索")
+        .onChange(of: vm.searchText) { _, _ in
+            vm.searchTextDidChange()
+        }
+        .toolbar {
+            ToolbarItem(placement: .topBarTrailing) {
+                Picker("表示", selection: $vm.filter) {
+                    ForEach(HistoryListViewModel.Filter.allCases) { filter in
+                        Text(filter.label).tag(filter)
+                    }
+                }
+                .pickerStyle(.menu)
+                .onChange(of: vm.filter) { _, _ in
+                    Task { await vm.filterDidChange() }
+                }
+            }
+        }
         .navigationDestination(for: UUID.self) { id in
             PeerDetailView(peerId: id)
         }
         .refreshable { await vm.load() }
-        .onAppear {
+        .task {
             vm.attach(env)
-            Task { await vm.load() }
+            await vm.load()
+        }
+    }
+
+    private var emptyTitle: String {
+        if vm.isFiltering {
+            "条件に合う履歴がありません"
+        } else {
+            "まだ交換履歴がありません"
+        }
+    }
+
+    private var emptySystemImage: String {
+        vm.isFiltering ? "magnifyingglass" : "person.2.slash"
+    }
+
+    private var emptyDescription: String {
+        if vm.isFiltering {
+            "検索ワードや表示条件を変えると、見つかる可能性があります。"
+        } else {
+            "近くの相手とプロフィールを交換すると、ここに記録されます。"
         }
     }
 }

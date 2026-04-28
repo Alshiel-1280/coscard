@@ -74,25 +74,25 @@ open CosCard.xcodeproj
   2. 双方が同じコードを目視確認し **「確認して承認する」** で `approvalState`。
   3. 双方承認後、短命トークン付き **軽量プロフィール** を送受信。
   4. **完了シート**でメモ・イベントタグを任意入力 → `SaveExchangeResultUseCase` で `LocalPeerKey` 算出、`PeerContact` upsert、`LightweightProfileSnapshot`、`ExchangeSession` 完了。
-- **履歴・詳細**: 一覧、アイコン・SNS・交換日・イベントタグ・セッション履歴、メモ、ブロック / 非表示（SwiftData）。
+- **履歴・詳細**: 一覧検索、ブロック中フィルタ、アイコン・SNS・交換日・イベントタグ・セッション履歴、メモ、ブロック / 非表示（SwiftData）。
 - **QR**: Base64 `WireEnvelope` 生成・スキャン（AVFoundation）、完了シートでメモ/タグ入力、トークン・期限検証、カメラ拒否時の案内。
 - **安定プロフィール ID**: `publicProfileId`（初回 `ensurePublicProfileId` で永続化）と `LocalPeerKey` の整理。
 - **権限**: `NSLocalNetworkUsageDescription`, `NSBluetoothAlwaysUsageDescription`, `NSCameraUsageDescription`, **`NSBonjourServices`**: `_coscard._tcp`（近傍探索用）。
 
-### 粗い / 今後（コード内 `TODO` 参照）
+### 粗い / 今後
 
-- `InvitePayload` に安定 ID を載せたブロック照合の強化。
-- `ResolveDuplicateExchangeUseCase` のユーザー選択 UX。
-- `KeychainStore` の SecItem 実装、`schemaVersion` マイグレーション本実装。
+- `schemaVersion` マイグレーション本実装。
+- 交換完了シートの保存失敗時リトライ UX 強化。
+- MPC のプロフィール送受信 ACK と片側成功時の状態整理。
 
 ---
 
 ## 今後のプラン（優先度の目安）
 
-1. **招待ワイヤ拡張** — `publicProfileId` とブロックリストの照合（表示名以外）。
-2. **重複交換 UX** — `ResolveDuplicateExchangeUseCase` で更新/スキップの選択。
-3. **Keychain** — 長期シークレットが必要になった段階で実装。
-4. **QR 画像** — サムネイル載せる場合のペイロードサイズ上限と圧縮。
+1. **保存失敗時の再試行 UX** — QR / MPC の完了シートで入力を保持したまま再試行。
+2. **MPC ACK** — プロフィール送受信完了の合意点を作り、片側成功を減らす。
+3. **schemaVersion マイグレーション** — payload 別の互換変換と固定テストデータ。
+4. **QR 画像** — 現状 QR はアイコンを含めない。サムネイル載せる場合のペイロードサイズ上限と圧縮。
 
 （[`docs/IMPLEMENTATION_STATUS.md`](docs/IMPLEMENTATION_STATUS.md) に詳細あり。）
 

@@ -19,7 +19,7 @@ final class PeerRepository: PeerRepositoryProtocol {
     }
 
     func listBlockedPeers(newestFirst: Bool) async throws -> [PeerSummary] {
-        var descriptor = FetchDescriptor<PeerContactEntity>(
+        let descriptor = FetchDescriptor<PeerContactEntity>(
             predicate: #Predicate { $0.isBlocked == true },
             sortBy: [SortDescriptor(\.lastMetAt, order: newestFirst ? .reverse : .forward)]
         )
@@ -93,9 +93,26 @@ final class PeerRepository: PeerRepositoryProtocol {
         return Set(list.map { $0.latestDisplayName.normalizedForPeerKey() })
     }
 
+    func blockedPublicProfileIds() async throws -> Set<String> {
+        let descriptor = FetchDescriptor<PeerContactEntity>(
+            predicate: #Predicate { $0.isBlocked == true }
+        )
+        let list = try modelContext.fetch(descriptor)
+        return Set(list.compactMap { Self.normalizedPublicProfileId($0.publicProfileId) })
+    }
+
     func hasPeer(withLocalPeerKey key: String) async throws -> Bool {
         var descriptor = FetchDescriptor<PeerContactEntity>(
             predicate: #Predicate { $0.localPeerKey == key }
+        )
+        descriptor.fetchLimit = 1
+        return try modelContext.fetch(descriptor).first != nil
+    }
+
+    func hasPeer(withPublicProfileId publicProfileId: String) async throws -> Bool {
+        guard let normalized = Self.normalizedPublicProfileId(publicProfileId) else { return false }
+        var descriptor = FetchDescriptor<PeerContactEntity>(
+            predicate: #Predicate { $0.publicProfileId == normalized }
         )
         descriptor.fetchLimit = 1
         return try modelContext.fetch(descriptor).first != nil
@@ -108,13 +125,14 @@ final class PeerRepository: PeerRepositoryProtocol {
         eventTag: String?
     ) async throws -> UUID {
         let now = Date()
-        var descriptor = FetchDescriptor<PeerContactEntity>(
-            predicate: #Predicate { $0.localPeerKey == localPeerKey }
-        )
-        descriptor.fetchLimit = 1
-        let existing = try modelContext.fetch(descriptor).first
+        let publicProfileId = Self.normalizedPublicProfileId(received.publicProfileId)
+        let existing = try fetchEntity(localPeerKey: localPeerKey, publicProfileId: publicProfileId)
         let peerId: UUID
         if let e = existing {
+            e.localPeerKey = localPeerKey
+            if let publicProfileId {
+                e.publicProfileId = publicProfileId
+            }
             e.latestDisplayName = received.displayName
             e.latestBio = received.bioShort
             e.latestSNSLabel = received.primarySNSLabel
@@ -129,6 +147,7 @@ final class PeerRepository: PeerRepositoryProtocol {
         } else {
             let e = PeerContactEntity(
                 localPeerKey: localPeerKey,
+                publicProfileId: publicProfileId,
                 latestDisplayName: received.displayName,
                 latestBio: received.bioShort,
                 latestSNSLabel: received.primarySNSLabel,
@@ -166,10 +185,34 @@ final class PeerRepository: PeerRepositoryProtocol {
         return try modelContext.fetch(descriptor).first
     }
 
+    private func fetchEntity(localPeerKey: String, publicProfileId: String?) throws -> PeerContactEntity? {
+        if let publicProfileId {
+            var publicIdDescriptor = FetchDescriptor<PeerContactEntity>(
+                predicate: #Predicate { $0.publicProfileId == publicProfileId }
+            )
+            publicIdDescriptor.fetchLimit = 1
+            if let existing = try modelContext.fetch(publicIdDescriptor).first {
+                return existing
+            }
+        }
+        var keyDescriptor = FetchDescriptor<PeerContactEntity>(
+            predicate: #Predicate { $0.localPeerKey == localPeerKey }
+        )
+        keyDescriptor.fetchLimit = 1
+        return try modelContext.fetch(keyDescriptor).first
+    }
+
+    private static func normalizedPublicProfileId(_ value: String?) -> String? {
+        let trimmed = value?.trimmedCoscard() ?? ""
+        guard !trimmed.isEmpty else { return nil }
+        return trimmed.lowercased()
+    }
+
     private func mapSummary(_ e: PeerContactEntity) -> PeerSummary {
         PeerSummary(
             id: e.id,
             localPeerKey: e.localPeerKey,
+            publicProfileId: e.publicProfileId,
             latestDisplayName: e.latestDisplayName,
             latestBio: e.latestBio,
             memo: e.memo,

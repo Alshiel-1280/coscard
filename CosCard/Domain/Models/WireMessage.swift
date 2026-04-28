@@ -42,6 +42,7 @@ struct HelloPayload: Codable, Sendable {
 struct InvitePayload: Codable, Sendable {
     var requesterPreviewName: String
     var requesterPreviewIconData: Data?
+    var publicProfileId: String? = nil
 }
 
 struct InviteAcceptedPayload: Codable, Sendable {

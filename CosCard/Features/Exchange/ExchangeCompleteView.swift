@@ -3,10 +3,37 @@ import SwiftUI
 struct ExchangeCompleteView: View {
     let peerName: String
     var peerBio: String?
+    var isDuplicateExchange = false
     @State private var memo = ""
     @State private var eventTag = ""
     @State private var isSaving = false
-    var onDone: (_ memo: String?, _ eventTag: String?) -> Void
+    var onDone: (_ memo: String?, _ eventTag: String?, _ duplicateChoice: DuplicateExchangeSaveChoice) -> Void
+
+    init(
+        peerName: String,
+        peerBio: String? = nil,
+        isDuplicateExchange: Bool = false,
+        onDone: @escaping (_ memo: String?, _ eventTag: String?) -> Void
+    ) {
+        self.peerName = peerName
+        self.peerBio = peerBio
+        self.isDuplicateExchange = isDuplicateExchange
+        self.onDone = { memo, eventTag, _ in
+            onDone(memo, eventTag)
+        }
+    }
+
+    init(
+        peerName: String,
+        peerBio: String? = nil,
+        isDuplicateExchange: Bool = false,
+        onDone: @escaping (_ memo: String?, _ eventTag: String?, _ duplicateChoice: DuplicateExchangeSaveChoice) -> Void
+    ) {
+        self.peerName = peerName
+        self.peerBio = peerBio
+        self.isDuplicateExchange = isDuplicateExchange
+        self.onDone = onDone
+    }
 
     var body: some View {
         Form {
@@ -33,6 +60,15 @@ struct ExchangeCompleteView: View {
                 .padding(.vertical, AppSpacing.md)
             }
             .listRowBackground(Color.clear)
+            if isDuplicateExchange {
+                Section {
+                    Label("保存済みの相手です", systemImage: "person.crop.circle.badge.exclamationmark")
+                        .font(.headline)
+                    Text("更新するとプロフィール、メモ、イベントタグを今回の内容で保存します。スキップすると連絡先は更新しません。")
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                }
+            }
             Section("メモ（任意）") {
                 TextField("メモ", text: $memo, axis: .vertical)
                     .lineLimit(2 ... 6)
@@ -48,16 +84,25 @@ struct ExchangeCompleteView: View {
                             .foregroundStyle(.secondary)
                     }
                 } else {
-                    Button("保存して完了") {
-                        isSaving = true
-                        let m = memo.trimmedCoscard()
-                        let t = eventTag.trimmedCoscard()
-                        onDone(m.isEmpty ? nil : m, t.isEmpty ? nil : t)
+                    Button(isDuplicateExchange ? "更新して完了" : "保存して完了") {
+                        submit(.updateExisting)
+                    }
+                    if isDuplicateExchange {
+                        Button("保存せず完了", role: .cancel) {
+                            submit(.skip)
+                        }
                     }
                 }
             }
         }
         .navigationTitle("完了")
+    }
+
+    private func submit(_ duplicateChoice: DuplicateExchangeSaveChoice) {
+        isSaving = true
+        let m = memo.trimmedCoscard()
+        let t = eventTag.trimmedCoscard()
+        onDone(m.isEmpty ? nil : m, t.isEmpty ? nil : t, duplicateChoice)
     }
 }
 

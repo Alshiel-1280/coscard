@@ -95,9 +95,17 @@ struct ExchangeModeView: View {
         }
         .sheet(isPresented: $vm.showExchangeComplete) {
             NavigationStack {
-                ExchangeCompleteView(peerName: vm.receivedPeerProfile?.displayName ?? "相手", peerBio: vm.receivedPeerProfile?.bioShort) { memo, tag in
+                ExchangeCompleteView(
+                    peerName: vm.receivedPeerProfile?.displayName ?? "相手",
+                    peerBio: vm.receivedPeerProfile?.bioShort,
+                    isDuplicateExchange: vm.receivedPeerIsDuplicate
+                ) { memo, tag, duplicateChoice in
                     Task {
-                        await vm.finalizeExchange(memo: memo, eventTag: tag)
+                        await vm.finalizeExchange(
+                            memo: memo,
+                            eventTag: tag,
+                            duplicateChoice: duplicateChoice
+                        )
                     }
                 }
             }

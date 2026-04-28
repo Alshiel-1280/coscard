@@ -16,6 +16,7 @@ final class ExchangeViewModel: ObservableObject {
     @Published private(set) var localUserApproved = false
     @Published private(set) var peerHasApproved = false
     @Published private(set) var receivedPeerProfile: LightweightProfile?
+    @Published private(set) var receivedPeerIsDuplicate = false
     @Published var showExchangeComplete = false
     /// 自分のプロフィール送信が完了したか（UI 用）
     @Published private(set) var hasSentMyProfile = false
@@ -64,16 +65,22 @@ final class ExchangeViewModel: ObservableObject {
     }
 
     private func refreshInviteBlockList(_ environment: AppEnvironment) async {
-        let blocked: Set<String>
+        var blockedNames: Set<String>
+        var blockedPublicProfileIds: Set<String>
         do {
-            blocked = try await environment.peerRepository.blockedNormalizedDisplayNames()
+            blockedNames = try await environment.peerRepository.blockedNormalizedDisplayNames()
+            blockedPublicProfileIds = try await environment.peerRepository.blockedPublicProfileIds()
         } catch {
-            AppLogger.error("blockedNormalizedDisplayNames failed: \(error.localizedDescription)", category: "Exchange")
-            blocked = []
+            AppLogger.error("blocked invite identifiers failed: \(error.localizedDescription)", category: "Exchange")
+            blockedNames = []
+            blockedPublicProfileIds = []
         }
-        environment.nearby.inviteAutoRejectPredicate = { preview in
+        environment.nearby.inviteAutoRejectPredicate = { preview, publicProfileId in
+            if let pid = Self.normalizedPublicProfileId(publicProfileId), blockedPublicProfileIds.contains(pid) {
+                return true
+            }
             guard let p = preview?.trimmedCoscard(), !p.isEmpty else { return false }
-            return blocked.contains(p.normalizedForPeerKey())
+            return blockedNames.contains(p.normalizedForPeerKey())
         }
     }
 
@@ -204,6 +211,7 @@ final class ExchangeViewModel: ObservableObject {
             AppLogger.log("fetchCurrentProfile failed in sendInvite: \(error.localizedDescription)", category: "Exchange")
             profile = nil
         }
+        let publicProfileId = await publicProfileIdForInvite(profile: profile, environment: env)
         do {
             try await env.exchangeSessionRepository.createSession(
                 id: exchangeId,
@@ -215,6 +223,7 @@ final class ExchangeViewModel: ObservableObject {
                 candidate: candidate,
                 previewName: profile?.displayName ?? "?",
                 previewIcon: profile?.iconThumbnailData,
+                publicProfileId: publicProfileId,
                 exchangeId: exchangeId
             )
             try await env.exchangeSessionRepository.updateSessionState(id: exchangeId, state: .invitationSent)
@@ -275,7 +284,11 @@ final class ExchangeViewModel: ObservableObject {
         }
     }
 
-    func finalizeExchange(memo: String?, eventTag: String?) async {
+    func finalizeExchange(
+        memo: String?,
+        eventTag: String?,
+        duplicateChoice: DuplicateExchangeSaveChoice = .updateExisting
+    ) async {
         guard let env, let profile = receivedPeerProfile, let sid = sessionEntityId else { return }
         let uc = SaveExchangeResultUseCase(
             peerRepository: env.peerRepository,
@@ -288,7 +301,8 @@ final class ExchangeViewModel: ObservableObject {
                 peerProfile: profile,
                 memo: memo,
                 eventTag: eventTag,
-                confirmationCode: confirmationCode
+                confirmationCode: confirmationCode,
+                duplicateChoice: duplicateChoice
             )
             showExchangeComplete = false
             resetExchangeFlow()
@@ -404,7 +418,7 @@ final class ExchangeViewModel: ObservableObject {
                             ephemeralToken: p.ephemeralToken,
                             tokenRepository: env.tokenRepository
                         )
-                        self.receivedPeerProfile = LightweightProfile(
+                        let peerProfile = LightweightProfile(
                             ephemeralToken: p.ephemeralToken,
                             publicProfileId: p.publicProfileId,
                             displayName: p.displayName,
@@ -414,6 +428,12 @@ final class ExchangeViewModel: ObservableObject {
                             profileVersion: p.profileVersion,
                             iconThumbnailData: p.iconThumbnailData
                         )
+                        let duplicateCheck = try await ResolveDuplicateExchangeUseCase().check(
+                            peerProfile: peerProfile,
+                            peerRepository: env.peerRepository
+                        )
+                        self.receivedPeerProfile = peerProfile
+                        self.receivedPeerIsDuplicate = duplicateCheck.isDuplicate
                         self.checkReadyForComplete()
                     } catch {
                         self.errorMessage = (error as? LocalizedError)?.errorDescription ?? error.localizedDescription
@@ -507,7 +527,31 @@ final class ExchangeViewModel: ObservableObject {
         peerHasApproved = false
         hasSentMyProfile = false
         receivedPeerProfile = nil
+        receivedPeerIsDuplicate = false
         showExchangeComplete = false
         showIncomingInviteSheet = false
+    }
+
+    private func publicProfileIdForInvite(profile: ProfileSummary?, environment: AppEnvironment) async -> String? {
+        guard let profile else { return nil }
+        if let existing = Self.trimmedPublicProfileId(profile.publicProfileId) {
+            return existing
+        }
+        do {
+            return try await environment.profileRepository.ensurePublicProfileId()
+        } catch {
+            AppLogger.log("ensurePublicProfileId failed in sendInvite: \(error.localizedDescription)", category: "Exchange")
+            return nil
+        }
+    }
+
+    private static func trimmedPublicProfileId(_ value: String?) -> String? {
+        let trimmed = value?.trimmedCoscard() ?? ""
+        guard !trimmed.isEmpty else { return nil }
+        return trimmed
+    }
+
+    private static func normalizedPublicProfileId(_ value: String?) -> String? {
+        trimmedPublicProfileId(value)?.lowercased()
     }
 }

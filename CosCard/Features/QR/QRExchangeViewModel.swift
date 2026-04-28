@@ -11,6 +11,7 @@ final class QRExchangeViewModel: ObservableObject {
     @Published var showScanner = false
     @Published var showScanComplete = false
     @Published var pendingScanPeerName = ""
+    @Published var pendingScanIsDuplicate = false
 
     private var env: AppEnvironment?
     private var scannedProfile: LightweightProfile?
@@ -79,6 +80,7 @@ final class QRExchangeViewModel: ObservableObject {
         guard let env else { return }
         errorMessage = nil
         scanSuccessMessage = nil
+        pendingScanIsDuplicate = false
         let trimmed = b64.trimmingCharacters(in: .whitespacesAndNewlines)
         guard let raw = Data(base64Encoded: trimmed) else {
             errorMessage = "読み取ったコードが CosCard の交換用データではありません"
@@ -110,23 +112,36 @@ final class QRExchangeViewModel: ObservableObject {
                 profileVersion: p.profileVersion,
                 iconThumbnailData: p.iconThumbnailData
             )
+            if try await isBlocked(peer) {
+                errorMessage = "ブロック中の相手です。履歴のブロックリストから解除してから保存してください。"
+                return
+            }
             try await env.exchangeSessionRepository.ensureSession(
                 id: envelope.exchangeId,
                 transport: "qr",
                 peerPreviewName: p.displayName,
                 peerPreviewIcon: p.iconThumbnailData
             )
+            let duplicateCheck = try await ResolveDuplicateExchangeUseCase().check(
+                peerProfile: peer,
+                peerRepository: env.peerRepository
+            )
             scannedProfile = peer
             scannedSessionId = envelope.exchangeId
             scannedExchangeIds.insert(envelope.exchangeId)
             pendingScanPeerName = p.displayName
+            pendingScanIsDuplicate = duplicateCheck.isDuplicate
             showScanComplete = true
         } catch {
             errorMessage = (error as? LocalizedError)?.errorDescription ?? error.localizedDescription
         }
     }
 
-    func finalizeScan(memo: String?, eventTag: String?) async {
+    func finalizeScan(
+        memo: String?,
+        eventTag: String?,
+        duplicateChoice: DuplicateExchangeSaveChoice = .updateExisting
+    ) async {
         guard let env, let profile = scannedProfile, let sid = scannedSessionId else { return }
         errorMessage = nil
         let uc = SaveExchangeResultUseCase(
@@ -135,22 +150,27 @@ final class QRExchangeViewModel: ObservableObject {
             tokenRepository: env.tokenRepository
         )
         do {
-            try await uc.execute(
+            let result = try await uc.execute(
                 sessionId: sid,
                 peerProfile: profile,
                 memo: memo,
                 eventTag: eventTag,
-                confirmationCode: nil
+                confirmationCode: nil,
+                duplicateChoice: duplicateChoice
             )
-            scanSuccessMessage = "\(profile.displayName) を保存しました"
+            scanSuccessMessage = result.skippedDuplicate
+                ? "\(profile.displayName) の保存をスキップしました"
+                : "\(profile.displayName) を保存しました"
             showScanComplete = false
             scannedProfile = nil
             scannedSessionId = nil
+            pendingScanIsDuplicate = false
         } catch {
             errorMessage = (error as? LocalizedError)?.errorDescription ?? error.localizedDescription
             showScanComplete = false
             scannedProfile = nil
             scannedSessionId = nil
+            pendingScanIsDuplicate = false
         }
     }
 
@@ -158,5 +178,25 @@ final class QRExchangeViewModel: ObservableObject {
         showScanComplete = false
         scannedProfile = nil
         scannedSessionId = nil
+        pendingScanIsDuplicate = false
+    }
+
+    private func isBlocked(_ peer: LightweightProfile) async throws -> Bool {
+        guard let env else { return false }
+        let localPeerKey = LocalPeerKey.make(from: peer)
+        if try await env.peerRepository.isBlockedLocalPeerKey(localPeerKey) {
+            return true
+        }
+        let publicProfileId = peer.publicProfileId?.trimmedCoscard().lowercased() ?? ""
+        if !publicProfileId.isEmpty {
+            let blockedPublicProfileIds = try await env.peerRepository.blockedPublicProfileIds()
+            if blockedPublicProfileIds.contains(publicProfileId) {
+                return true
+            }
+        }
+        let normalizedName = peer.displayName.normalizedForPeerKey()
+        guard !normalizedName.isEmpty else { return false }
+        let blockedNames = try await env.peerRepository.blockedNormalizedDisplayNames()
+        return blockedNames.contains(normalizedName)
     }
 }

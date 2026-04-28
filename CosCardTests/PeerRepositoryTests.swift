@@ -85,6 +85,98 @@ final class PeerRepositoryTests: XCTestCase {
         XCTAssertTrue(afterUnblock.isEmpty)
     }
 
+    func testBlockedInviteIdentifiersIncludePublicProfileIdAndDisplayName() async throws {
+        let profile = LightweightProfile(
+            ephemeralToken: "tok-public-block",
+            publicProfileId: " PID-BLOCK ",
+            displayName: "ブロックIDテスト",
+            profileVersion: 1
+        )
+        let key = LocalPeerKey.make(from: profile)
+        let peerId = try await repo.upsertPeerFromExchange(
+            localPeerKey: key,
+            received: profile,
+            memo: nil,
+            eventTag: nil
+        )
+
+        try await repo.setBlocked(peerId: peerId, blocked: true)
+
+        let publicIds = try await repo.blockedPublicProfileIds()
+        let displayNames = try await repo.blockedNormalizedDisplayNames()
+        XCTAssertTrue(publicIds.contains("pid-block"))
+        XCTAssertTrue(displayNames.contains("ブロックIDテスト".normalizedForPeerKey()))
+    }
+
+    func testExchangeInviteAutoRejectUsesPublicProfileIdAndLegacyName() async throws {
+        let env = AppEnvironment(modelContext: context)
+        let profile = LightweightProfile(
+            ephemeralToken: "tok-invite-block",
+            publicProfileId: "PID-INVITE-BLOCK",
+            displayName: "招待ブロック",
+            profileVersion: 1
+        )
+        let key = LocalPeerKey.make(from: profile)
+        let peerId = try await env.peerRepository.upsertPeerFromExchange(
+            localPeerKey: key,
+            received: profile,
+            memo: nil,
+            eventTag: nil
+        )
+        try await env.peerRepository.setBlocked(peerId: peerId, blocked: true)
+
+        let vm = ExchangeViewModel()
+        vm.attach(env)
+        await vm.refreshInviteBlockListAsync()
+
+        let predicate = try XCTUnwrap(env.nearby.inviteAutoRejectPredicate)
+        XCTAssertTrue(predicate("別名", "pid-invite-block"))
+        XCTAssertTrue(predicate("招待ブロック", nil))
+        XCTAssertFalse(predicate("別名", "pid-other"))
+    }
+
+    func testQRScanRejectsBlockedPublicProfileId() async throws {
+        let env = AppEnvironment(modelContext: context)
+        let blockedProfile = LightweightProfile(
+            ephemeralToken: "tok-qr-blocked-original",
+            publicProfileId: "pid-qr-blocked",
+            displayName: "QRブロック",
+            profileVersion: 1
+        )
+        let peerId = try await env.peerRepository.upsertPeerFromExchange(
+            localPeerKey: LocalPeerKey.make(from: blockedProfile),
+            received: blockedProfile,
+            memo: nil,
+            eventTag: nil
+        )
+        try await env.peerRepository.setBlocked(peerId: peerId, blocked: true)
+
+        let scannedPayload = LightweightProfilePayload(
+            ephemeralToken: "tok-qr-blocked-scan",
+            publicProfileId: "PID-QR-BLOCKED",
+            displayName: "QRブロック更新",
+            bioShort: nil,
+            primarySNSLabel: nil,
+            primarySNSURL: nil,
+            profileVersion: 2,
+            iconThumbnailData: nil
+        )
+        let envelope = try MPCMessageEncoder.encodeEnvelope(
+            messageType: .lightweightProfile,
+            exchangeId: UUID(),
+            payload: scannedPayload,
+            expiresAt: Date().addingTimeInterval(180)
+        )
+        let vm = QRExchangeViewModel()
+        vm.attach(env)
+
+        await vm.handleScannedBase64(envelope.base64EncodedString())
+
+        XCTAssertFalse(vm.showScanComplete)
+        XCTAssertEqual(vm.pendingScanPeerName, "")
+        XCTAssertEqual(vm.errorMessage, "ブロック中の相手です。履歴のブロックリストから解除してから保存してください。")
+    }
+
     func testUpdateMemo() async throws {
         let profile = LightweightProfile(
             ephemeralToken: "tok-m",

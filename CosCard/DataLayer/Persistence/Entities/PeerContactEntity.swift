@@ -5,6 +5,7 @@ import SwiftData
 final class PeerContactEntity {
     @Attribute(.unique) var id: UUID
     var localPeerKey: String
+    var publicProfileId: String?
     var latestDisplayName: String
     var latestBio: String?
     var latestSNSLabel: String?
@@ -26,6 +27,7 @@ final class PeerContactEntity {
     init(
         id: UUID = UUID(),
         localPeerKey: String,
+        publicProfileId: String? = nil,
         latestDisplayName: String,
         latestBio: String? = nil,
         latestSNSLabel: String? = nil,
@@ -43,6 +45,7 @@ final class PeerContactEntity {
     ) {
         self.id = id
         self.localPeerKey = localPeerKey
+        self.publicProfileId = publicProfileId
         self.latestDisplayName = latestDisplayName
         self.latestBio = latestBio
         self.latestSNSLabel = latestSNSLabel

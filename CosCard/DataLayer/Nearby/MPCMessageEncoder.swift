@@ -2,6 +2,10 @@ import Foundation
 
 /// WireEnvelope の JSON 送受信と checksum 検証。
 enum MPCMessageEncoder {
+    private struct WireEnvelopeVersionProbe: Decodable {
+        var schemaVersion: Int
+    }
+
     private struct WireEnvelopeTransport: Codable {
         var schemaVersion: Int
         var messageType: WireMessageType
@@ -11,6 +15,8 @@ enum MPCMessageEncoder {
         var payloadBase64: String
         var checksum: String
     }
+
+    private static let minimumDecodableSchemaVersion = 1
 
     private static let encoder: JSONEncoder = {
         let e = JSONEncoder()
@@ -59,7 +65,24 @@ enum MPCMessageEncoder {
     }
 
     static func decodeEnvelope(_ data: Data) throws -> WireEnvelope {
-        let t = try decoder.decode(WireEnvelopeTransport.self, from: data)
+        let schemaVersion: Int
+        do {
+            schemaVersion = try decoder.decode(WireEnvelopeVersionProbe.self, from: data).schemaVersion
+        } catch {
+            throw CosCardError.invalidPayload
+        }
+        guard schemaVersion >= minimumDecodableSchemaVersion else {
+            throw CosCardError.invalidPayload
+        }
+        guard schemaVersion <= WireSchema.currentVersion else {
+            throw CosCardError.unsupportedSchemaVersion
+        }
+        let t: WireEnvelopeTransport
+        do {
+            t = try decoder.decode(WireEnvelopeTransport.self, from: data)
+        } catch {
+            throw CosCardError.invalidPayload
+        }
         guard let payloadData = Data(base64Encoded: t.payloadBase64) else {
             throw CosCardError.invalidPayload
         }
@@ -74,9 +97,7 @@ enum MPCMessageEncoder {
         guard expected == t.checksum else {
             throw CosCardError.checksumMismatch
         }
-        if t.schemaVersion != WireSchema.currentVersion {
-            // TODO: マイグレーション
-        }
+        try validateJSONPayload(payloadData)
         return WireEnvelope(
             schemaVersion: t.schemaVersion,
             messageType: t.messageType,
@@ -86,6 +107,14 @@ enum MPCMessageEncoder {
             payload: payloadData,
             checksum: t.checksum
         )
+    }
+
+    private static func validateJSONPayload(_ payloadData: Data) throws {
+        do {
+            _ = try JSONSerialization.jsonObject(with: payloadData, options: [.fragmentsAllowed])
+        } catch {
+            throw CosCardError.invalidPayload
+        }
     }
 
     private static func makeChecksum(
@@ -112,6 +141,7 @@ enum MPCMessageEncoder {
 enum CosCardError: Error, LocalizedError, Equatable {
     case invalidPayload
     case checksumMismatch
+    case unsupportedSchemaVersion
     case notConnected
     case peerNotFound
     case sessionMissing
@@ -123,6 +153,7 @@ enum CosCardError: Error, LocalizedError, Equatable {
         switch self {
         case .invalidPayload: return "データの形式が正しくありません"
         case .checksumMismatch: return "データが壊れているか改ざんされています"
+        case .unsupportedSchemaVersion: return "対応していない交換データのバージョンです"
         case .notConnected: return "接続されていません"
         case .peerNotFound: return "相手が見つかりません"
         case .sessionMissing: return "セッションがありません"

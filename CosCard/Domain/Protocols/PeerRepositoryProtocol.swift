@@ -3,6 +3,7 @@ import Foundation
 struct PeerSummary: Identifiable, Equatable, Sendable {
     var id: UUID
     var localPeerKey: String
+    var publicProfileId: String?
     var latestDisplayName: String
     var latestBio: String?
     var memo: String?
@@ -44,7 +45,10 @@ protocol PeerRepositoryProtocol: AnyObject {
     func isBlockedLocalPeerKey(_ key: String) async throws -> Bool
     /// ブロック済みピアの表示名（正規化）集合 — 招待時の簡易フィルタ用
     func blockedNormalizedDisplayNames() async throws -> Set<String>
+    /// ブロック済みピアの publicProfileId 集合 — 招待時の安定識別子フィルタ用
+    func blockedPublicProfileIds() async throws -> Set<String>
     func hasPeer(withLocalPeerKey key: String) async throws -> Bool
+    func hasPeer(withPublicProfileId publicProfileId: String) async throws -> Bool
 
     func upsertPeerFromExchange(
         localPeerKey: String,

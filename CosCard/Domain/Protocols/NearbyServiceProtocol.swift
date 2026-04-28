@@ -15,13 +15,19 @@ protocol NearbyServiceProtocol: AnyObject {
     var onPeerDisconnected: (() -> Void)? { get set }
     /// 広告・ブラウズ開始失敗（ローカルネットワーク権限など）
     var onPermissionError: ((String) -> Void)? { get set }
-    /// 招待のプレビュー名がブロック一覧と一致する場合に true を返す（同期）
-    var inviteAutoRejectPredicate: ((String?) -> Bool)? { get set }
+    /// 招待元がブロック一覧と一致する場合に true を返す（同期）
+    var inviteAutoRejectPredicate: ((String?, String?) -> Bool)? { get set }
 
     func startAdvertisingAndBrowsing(displayName: String) async throws
     func stop() async
 
-    func sendInvite(to candidate: PeerCandidate, previewName: String, previewIcon: Data?, exchangeId: UUID) async throws
+    func sendInvite(
+        to candidate: PeerCandidate,
+        previewName: String,
+        previewIcon: Data?,
+        publicProfileId: String?,
+        exchangeId: UUID
+    ) async throws
     func acceptInvite() async throws
     func rejectInvite() async throws
 

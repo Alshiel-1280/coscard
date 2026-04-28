@@ -79,9 +79,16 @@ struct QRExchangeView: View {
         }
         .sheet(isPresented: $vm.showScanComplete) {
             NavigationStack {
-                ExchangeCompleteView(peerName: vm.pendingScanPeerName) { memo, tag in
+                ExchangeCompleteView(
+                    peerName: vm.pendingScanPeerName,
+                    isDuplicateExchange: vm.pendingScanIsDuplicate
+                ) { memo, tag, duplicateChoice in
                     Task {
-                        await vm.finalizeScan(memo: memo, eventTag: tag)
+                        await vm.finalizeScan(
+                            memo: memo,
+                            eventTag: tag,
+                            duplicateChoice: duplicateChoice
+                        )
                     }
                 }
                 .toolbar {

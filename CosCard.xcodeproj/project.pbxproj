@@ -22,6 +22,7 @@
 		169054682FE1EFFC7CF3D5B4 /* TokenRepositoryTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 46F1CF5D279F6B7BAAC75F4A /* TokenRepositoryTests.swift */; };
 		18516E773AD9A04D094343F5 /* Logger.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4D8D4E0B4AF1D1E71162108A /* Logger.swift */; };
 		1B4BCFB6928F2508808BE023 /* LightweightProfileSnapshotEntity.swift in Sources */ = {isa = PBXBuildFile; fileRef = 574F1C451E5B5E2FA521C5D1 /* LightweightProfileSnapshotEntity.swift */; };
+		1CF5A5CE3C76CC69CE1C8E1B /* KeychainStoreTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = CAE9D0CF977F3E105B3FAF21 /* KeychainStoreTests.swift */; };
 		1D61B3EB34022D4185FBB1A6 /* ExchangeTokenEntity.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6958C96466649E5396E00CD /* ExchangeTokenEntity.swift */; };
 		21CE97677F2D0677F40976D4 /* GenerateEphemeralTokenUseCase.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6F7E7B48EBE9F4DA0E4731D0 /* GenerateEphemeralTokenUseCase.swift */; };
 		221AA895B7AD2391937C9729 /* RejectInviteUseCase.swift in Sources */ = {isa = PBXBuildFile; fileRef = 83754140303F32E49643B792 /* RejectInviteUseCase.swift */; };
@@ -172,6 +173,7 @@
 		C17FAB9DD33EFF9D0647C2A9 /* TokenRepositoryProtocol.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TokenRepositoryProtocol.swift; sourceTree = "<group>"; };
 		C3E57D57F0A531D4A3B7763A /* MPCMessageEncoder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MPCMessageEncoder.swift; sourceTree = "<group>"; };
 		C7E167C7BA9D81C626B78C80 /* MPCManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MPCManager.swift; sourceTree = "<group>"; };
+		CAE9D0CF977F3E105B3FAF21 /* KeychainStoreTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeychainStoreTests.swift; sourceTree = "<group>"; };
 		CB2FF5AA49B273BA45384258 /* BlockListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BlockListView.swift; sourceTree = "<group>"; };
 		CBB7F883E68005449F440C38 /* BlockListViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BlockListViewModel.swift; sourceTree = "<group>"; };
 		CD580ED17971FF588371664D /* PeerDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PeerDetailView.swift; sourceTree = "<group>"; };
@@ -397,6 +399,7 @@
 		8F1FC60D3612154B590A292E /* CosCardTests */ = {
 			isa = PBXGroup;
 			children = (
+				CAE9D0CF977F3E105B3FAF21 /* KeychainStoreTests.swift */,
 				206F2F43182FD6E5E2A199E5 /* LocalPeerKeyTests.swift */,
 				064A440B74B7E218DDE72698 /* MPCMessageEncoderTests.swift */,
 				54F2105AEC0EB1E53D11EF0E /* PeerRepositoryTests.swift */,
@@ -633,6 +636,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				1CF5A5CE3C76CC69CE1C8E1B /* KeychainStoreTests.swift in Sources */,
 				9117800EA1995F01087DEBC9 /* LocalPeerKeyTests.swift in Sources */,
 				FC642ACAD80B5D68516765DD /* MPCMessageEncoderTests.swift in Sources */,
 				7196B5492B4D8AF36A4C10BF /* PeerRepositoryTests.swift in Sources */,
