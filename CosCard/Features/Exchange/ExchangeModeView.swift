@@ -97,7 +97,6 @@ struct ExchangeModeView: View {
             NavigationStack {
                 ExchangeCompleteView(
                     peerName: vm.receivedPeerProfile?.displayName ?? "相手",
-                    peerBio: vm.receivedPeerProfile?.bioShort,
                     isDuplicateExchange: vm.receivedPeerIsDuplicate
                 ) { memo, tag, duplicateChoice in
                     Task {

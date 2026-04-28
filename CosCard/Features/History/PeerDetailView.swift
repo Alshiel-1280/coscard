@@ -33,21 +33,10 @@ struct PeerDetailView: View {
                             }
                             VStack(alignment: .leading, spacing: 4) {
                                 Text(d.summary.latestDisplayName).font(.headline)
-                                if let bio = d.summary.latestBio, !bio.isEmpty {
-                                    Text(bio).font(.subheadline).foregroundStyle(.secondary)
-                                }
                             }
                         }
-                        if let label = d.latestSNSLabel, let urlStr = d.latestSNSURL,
-                           let url = URL(string: urlStr), !urlStr.isEmpty
-                        {
-                            Link(destination: url) {
-                                Label(label, systemImage: "link")
-                            }
-                        } else if let urlStr = d.latestSNSURL, let url = URL(string: urlStr), !urlStr.isEmpty {
-                            Link(destination: url) {
-                                Label(urlStr, systemImage: "link")
-                            }
+                        if let snsValue = socialDisplayValue(label: d.latestSNSLabel, rawValue: d.latestSNSURL) {
+                            LabeledContent(d.latestSNSLabel ?? "SNS", value: snsValue)
                         }
                     }
                     Section("交換日・タグ") {
@@ -150,6 +139,20 @@ struct PeerDetailView: View {
             await vm.load(peerId: peerId)
             memoText = vm.detail?.summary.memo ?? ""
         }
+    }
+
+    private func socialDisplayValue(label: String?, rawValue: String?) -> String? {
+        let normalizedLabel = (label ?? "").lowercased()
+        if normalizedLabel.contains("insta") {
+            return SNSUserID.display(rawValue, service: .instagram)
+        }
+        if normalizedLabel.contains("tik") {
+            return SNSUserID.display(rawValue, service: .tiktok)
+        }
+        if normalizedLabel.contains("x") || normalizedLabel.contains("twitter") {
+            return SNSUserID.display(rawValue, service: .x)
+        }
+        return SNSUserID.display(rawValue)
     }
 }
 

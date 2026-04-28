@@ -2,7 +2,6 @@ import SwiftUI
 
 struct ExchangeCompleteView: View {
     let peerName: String
-    var peerBio: String?
     var isDuplicateExchange = false
     @State private var memo = ""
     @State private var eventTag = ""
@@ -11,12 +10,10 @@ struct ExchangeCompleteView: View {
 
     init(
         peerName: String,
-        peerBio: String? = nil,
         isDuplicateExchange: Bool = false,
         onDone: @escaping (_ memo: String?, _ eventTag: String?) -> Void
     ) {
         self.peerName = peerName
-        self.peerBio = peerBio
         self.isDuplicateExchange = isDuplicateExchange
         self.onDone = { memo, eventTag, _ in
             onDone(memo, eventTag)
@@ -25,12 +22,10 @@ struct ExchangeCompleteView: View {
 
     init(
         peerName: String,
-        peerBio: String? = nil,
         isDuplicateExchange: Bool = false,
         onDone: @escaping (_ memo: String?, _ eventTag: String?, _ duplicateChoice: DuplicateExchangeSaveChoice) -> Void
     ) {
         self.peerName = peerName
-        self.peerBio = peerBio
         self.isDuplicateExchange = isDuplicateExchange
         self.onDone = onDone
     }
@@ -48,13 +43,6 @@ struct ExchangeCompleteView: View {
                     Text(peerName)
                         .font(.headline)
                         .foregroundStyle(.secondary)
-                    if let bio = peerBio, !bio.isEmpty {
-                        Text(bio)
-                            .font(.subheadline)
-                            .foregroundStyle(.tertiary)
-                            .multilineTextAlignment(.center)
-                            .lineLimit(2)
-                    }
                 }
                 .frame(maxWidth: .infinity)
                 .padding(.vertical, AppSpacing.md)
@@ -108,6 +96,6 @@ struct ExchangeCompleteView: View {
 
 #Preview {
     NavigationStack {
-        ExchangeCompleteView(peerName: "相手", peerBio: "コスプレイヤーです") { _, _ in }
+        ExchangeCompleteView(peerName: "相手") { _, _ in }
     }
 }

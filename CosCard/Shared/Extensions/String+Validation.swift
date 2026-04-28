@@ -16,22 +16,18 @@ extension String {
 
 enum ProfileValidation {
     static let displayNameRange = 1 ... 24
-    static let bioRange = 0 ... 300
-    static let snsURLRange = 0 ... 200
+    static let snsUserIDRange = 0 ... 50
 
     static func validateDisplayName(_ s: String) -> Bool {
         let t = s.trimmedCoscard()
         return displayNameRange.contains(t.count)
     }
 
-    static func validateBio(_ s: String?) -> Bool {
+    static func validateSNSUserID(_ s: String?) -> Bool {
         let t = (s ?? "").trimmedCoscard()
-        return bioRange.contains(t.count)
-    }
-
-    static func validateSNSURL(_ s: String?) -> Bool {
-        let t = (s ?? "").trimmedCoscard()
-        return snsURLRange.contains(t.count)
+        let disallowed: Set<Character> = ["/", ":", "?", "#"]
+        return snsUserIDRange.contains(t.count)
+            && !t.contains(where: { $0.isWhitespace || disallowed.contains($0) })
     }
 
     // MARK: - 交換ペイロード（MPC / QR 共通）

@@ -50,17 +50,11 @@ struct MyCardView: View {
                     Text(p.displayName)
                         .font(.title2.weight(.bold))
                 }
-                if let workSamples = p.bio, !workSamples.isEmpty {
-                    Text(workSamples)
-                        .font(.body)
-                        .foregroundStyle(.primary)
-                        .padding(.top, AppSpacing.xs)
-                }
                 let links = socialLinks(from: p)
                 if !links.isEmpty {
                     VStack(alignment: .leading, spacing: AppSpacing.xs) {
                         ForEach(links, id: \.label) { item in
-                            socialLinkRow(label: item.label, urlString: item.url)
+                            socialIDRow(label: item.label, userID: item.userID)
                         }
                     }
                     .padding(.top, AppSpacing.xs)
@@ -99,36 +93,28 @@ struct MyCardView: View {
     }
 
     @ViewBuilder
-    private func socialLinkRow(label: String, urlString: String) -> some View {
-        if let url = URL(string: urlString), url.scheme != nil {
-            Link(destination: url) {
-                LabeledContent(label, value: urlString)
-                    .font(.caption)
-                    .foregroundStyle(.secondary)
-            }
-        } else {
-            LabeledContent(label, value: urlString)
-                .font(.caption)
-                .foregroundStyle(.secondary)
-        }
+    private func socialIDRow(label: String, userID: String) -> some View {
+        LabeledContent(label, value: userID)
+            .font(.caption)
+            .foregroundStyle(.secondary)
     }
 
-    private func socialLinks(from profile: ProfileSummary) -> [(label: String, url: String)] {
-        var links: [(label: String, url: String)] = []
-        if let twitter = normalized(profile.twitterURL) {
-            links.append(("Twitter", twitter))
+    private func socialLinks(from profile: ProfileSummary) -> [(label: String, userID: String)] {
+        var links: [(label: String, userID: String)] = []
+        if let twitter = SNSUserID.display(profile.twitterURL, service: .x) {
+            links.append(("X", twitter))
         }
-        if let instagram = normalized(profile.instagramURL) {
+        if let instagram = SNSUserID.display(profile.instagramURL, service: .instagram) {
             links.append(("Instagram", instagram))
         }
-        if let tiktok = normalized(profile.tiktokURL) {
+        if let tiktok = SNSUserID.display(profile.tiktokURL, service: .tiktok) {
             links.append(("TikTok", tiktok))
         }
         if links.isEmpty,
            let label = normalized(profile.primarySNSLabel),
-           let url = normalized(profile.primarySNSURL)
+           let userID = SNSUserID.display(profile.primarySNSURL)
         {
-            links.append((label, url))
+            links.append((label, userID))
         }
         return links
     }

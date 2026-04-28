@@ -4,10 +4,9 @@ import UIKit
 @MainActor
 final class ProfileEditViewModel: ObservableObject {
     @Published var displayName = ""
-    @Published var workSamples = ""
-    @Published var twitterURL = ""
-    @Published var instagramURL = ""
-    @Published var tiktokURL = ""
+    @Published var xUserID = ""
+    @Published var instagramUserID = ""
+    @Published var tiktokUserID = ""
     @Published private(set) var iconThumbnailData: Data?
     @Published var errorMessage: String?
 
@@ -22,10 +21,9 @@ final class ProfileEditViewModel: ObservableObject {
         do {
             if let p = try await env.profileRepository.fetchCurrentProfile() {
                 displayName = p.displayName
-                workSamples = p.bio ?? ""
-                twitterURL = p.twitterURL ?? ""
-                instagramURL = p.instagramURL ?? ""
-                tiktokURL = p.tiktokURL ?? ""
+                xUserID = SNSUserID.normalize(p.twitterURL, service: .x) ?? ""
+                instagramUserID = SNSUserID.normalize(p.instagramURL, service: .instagram) ?? ""
+                tiktokUserID = SNSUserID.normalize(p.tiktokURL, service: .tiktok) ?? ""
                 iconThumbnailData = p.iconThumbnailData
                 applyLegacySNSDataIfNeeded(primaryLabel: p.primarySNSLabel, primaryURL: p.primarySNSURL)
             }
@@ -38,12 +36,12 @@ final class ProfileEditViewModel: ObservableObject {
         errorMessage = nil
         let draft = ProfileDraft(
             displayName: displayName.trimmedCoscard(),
-            bio: normalizedOptional(workSamples),
+            bio: nil,
             primarySNSLabel: nil,
             primarySNSURL: nil,
-            twitterURL: normalizedOptional(twitterURL),
-            instagramURL: normalizedOptional(instagramURL),
-            tiktokURL: normalizedOptional(tiktokURL),
+            twitterURL: SNSUserID.normalize(xUserID, service: .x),
+            instagramURL: SNSUserID.normalize(instagramUserID, service: .instagram),
+            tiktokURL: SNSUserID.normalize(tiktokUserID, service: .tiktok),
             iconThumbnailData: iconThumbnailData
         )
         guard let env else { return false }
@@ -78,22 +76,17 @@ final class ProfileEditViewModel: ObservableObject {
         iconThumbnailData = nil
     }
 
-    private func normalizedOptional(_ value: String) -> String? {
-        let trimmed = value.trimmedCoscard()
-        return trimmed.isEmpty ? nil : trimmed
-    }
-
     private func applyLegacySNSDataIfNeeded(primaryLabel: String?, primaryURL: String?) {
-        guard twitterURL.isEmpty, instagramURL.isEmpty, tiktokURL.isEmpty else { return }
-        guard let legacyURL = normalizedOptional(primaryURL ?? "") else { return }
+        guard xUserID.isEmpty, instagramUserID.isEmpty, tiktokUserID.isEmpty else { return }
+        let raw = primaryURL ?? ""
 
         let label = (primaryLabel ?? "").trimmedCoscard().lowercased()
         if label.contains("insta") {
-            instagramURL = legacyURL
+            instagramUserID = SNSUserID.normalize(raw, service: .instagram) ?? ""
         } else if label.contains("tik") {
-            tiktokURL = legacyURL
+            tiktokUserID = SNSUserID.normalize(raw, service: .tiktok) ?? ""
         } else {
-            twitterURL = legacyURL
+            xUserID = SNSUserID.normalize(raw, service: .x) ?? ""
         }
     }
 }

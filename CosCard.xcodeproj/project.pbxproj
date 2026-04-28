@@ -26,6 +26,7 @@
 		1D61B3EB34022D4185FBB1A6 /* ExchangeTokenEntity.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6958C96466649E5396E00CD /* ExchangeTokenEntity.swift */; };
 		21CE97677F2D0677F40976D4 /* GenerateEphemeralTokenUseCase.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6F7E7B48EBE9F4DA0E4731D0 /* GenerateEphemeralTokenUseCase.swift */; };
 		221AA895B7AD2391937C9729 /* RejectInviteUseCase.swift in Sources */ = {isa = PBXBuildFile; fileRef = 83754140303F32E49643B792 /* RejectInviteUseCase.swift */; };
+		2749E73228E37D2B1525415C /* SNSUserID.swift in Sources */ = {isa = PBXBuildFile; fileRef = E5471ADB144DF3E46E8E0070 /* SNSUserID.swift */; };
 		28856CB05087532BE662A6AC /* ExchangeState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1F482CACF78919227CFC6EB0 /* ExchangeState.swift */; };
 		2BD406F9A71059D00D82D4A8 /* KeychainStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3995C9E43C0841DD503188E0 /* KeychainStore.swift */; };
 		2CD57636796DDD8C0FEEC31F /* HomeViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = F70B7BDF6CAC0A10355F8F62 /* HomeViewModel.swift */; };
@@ -187,6 +188,7 @@
 		DF4E167DEB228728FEA48BE9 /* ConfirmationCodeGenerator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConfirmationCodeGenerator.swift; sourceTree = "<group>"; };
 		E0D2C58CDF2DEB605B322F41 /* PeerDetailViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PeerDetailViewModel.swift; sourceTree = "<group>"; };
 		E129D54563B0D83CA7856BC9 /* String+Validation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "String+Validation.swift"; sourceTree = "<group>"; };
+		E5471ADB144DF3E46E8E0070 /* SNSUserID.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SNSUserID.swift; sourceTree = "<group>"; };
 		E7BD4D7B3DCABF8CA4670A85 /* SettingsViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsViewModel.swift; sourceTree = "<group>"; };
 		E85DF252ACB68AE543FB81FE /* ImageResizer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImageResizer.swift; sourceTree = "<group>"; };
 		EEAAECFEFD26B0971CDB89EC /* PeerRepositoryProtocol.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PeerRepositoryProtocol.swift; sourceTree = "<group>"; };
@@ -434,6 +436,7 @@
 				12189C9321C88334341E9E06 /* LocalPeerKey.swift */,
 				4D8D4E0B4AF1D1E71162108A /* Logger.swift */,
 				755925323B0AA76817C48B01 /* QRCodeGenerator.swift */,
+				E5471ADB144DF3E46E8E0070 /* SNSUserID.swift */,
 			);
 			path = Utils;
 			sourceTree = "<group>";
@@ -716,6 +719,7 @@
 				221AA895B7AD2391937C9729 /* RejectInviteUseCase.swift in Sources */,
 				EF310AC9071E49BFA0F94B7A /* ResolveDuplicateExchangeUseCase.swift in Sources */,
 				4FB80777485651FF14AD8B1A /* RootView.swift in Sources */,
+				2749E73228E37D2B1525415C /* SNSUserID.swift in Sources */,
 				8490D81C76A63FAB870A6DE2 /* SaveExchangeResultUseCase.swift in Sources */,
 				608345C48AD631B1224924A5 /* SendInviteUseCase.swift in Sources */,
 				8DC5FA9EDA0230C843DBAFB0 /* SettingsView.swift in Sources */,

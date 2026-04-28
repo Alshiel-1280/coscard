@@ -65,7 +65,6 @@ final class HistoryListViewModel: ObservableObject {
 
         peers = allPeers.filter { peer in
             matches(query, in: peer.latestDisplayName)
-                || matches(query, in: peer.latestBio)
                 || matches(query, in: peer.memo)
         }
     }

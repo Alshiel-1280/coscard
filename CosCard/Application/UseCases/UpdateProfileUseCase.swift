@@ -2,26 +2,20 @@ import Foundation
 
 enum ProfileEditValidationError: LocalizedError {
     case invalidDisplayName
-    case invalidWorkSamples
-    case invalidTwitterURL
-    case invalidInstagramURL
-    case invalidTikTokURL
-    case invalidSNSURL
+    case invalidXUserID
+    case invalidInstagramUserID
+    case invalidTikTokUserID
 
     var errorDescription: String? {
         switch self {
         case .invalidDisplayName:
             return "表示名は1〜24文字で入力してください"
-        case .invalidWorkSamples:
-            return "作例は300文字以内で入力してください"
-        case .invalidTwitterURL:
-            return "Twitter URLは200文字以内で入力してください"
-        case .invalidInstagramURL:
-            return "Instagram URLは200文字以内で入力してください"
-        case .invalidTikTokURL:
-            return "TikTok URLは200文字以内で入力してください"
-        case .invalidSNSURL:
-            return "SNS URLは200文字以内で入力してください"
+        case .invalidXUserID:
+            return "XのユーザーIDは50文字以内・空白なしで入力してください"
+        case .invalidInstagramUserID:
+            return "InstagramのユーザーIDは50文字以内・空白なしで入力してください"
+        case .invalidTikTokUserID:
+            return "TikTokのユーザーIDは50文字以内・空白なしで入力してください"
         }
     }
 }
@@ -34,20 +28,14 @@ struct UpdateProfileUseCase {
         guard ProfileValidation.validateDisplayName(draft.displayName) else {
             throw ProfileEditValidationError.invalidDisplayName
         }
-        guard ProfileValidation.validateBio(draft.bio) else {
-            throw ProfileEditValidationError.invalidWorkSamples
+        guard ProfileValidation.validateSNSUserID(draft.twitterURL) else {
+            throw ProfileEditValidationError.invalidXUserID
         }
-        guard ProfileValidation.validateSNSURL(draft.twitterURL) else {
-            throw ProfileEditValidationError.invalidTwitterURL
+        guard ProfileValidation.validateSNSUserID(draft.instagramURL) else {
+            throw ProfileEditValidationError.invalidInstagramUserID
         }
-        guard ProfileValidation.validateSNSURL(draft.instagramURL) else {
-            throw ProfileEditValidationError.invalidInstagramURL
-        }
-        guard ProfileValidation.validateSNSURL(draft.tiktokURL) else {
-            throw ProfileEditValidationError.invalidTikTokURL
-        }
-        guard ProfileValidation.validateSNSURL(draft.primarySNSURL) else {
-            throw ProfileEditValidationError.invalidSNSURL
+        guard ProfileValidation.validateSNSUserID(draft.tiktokURL) else {
+            throw ProfileEditValidationError.invalidTikTokUserID
         }
         return try await profileRepository.upsertProfile(draft)
     }

@@ -42,52 +42,37 @@ struct ProfileEditView: View {
             }
 
             Section {
-                TextField("作品URLや実績など（任意）", text: $vm.workSamples, axis: .vertical)
-                    .lineLimit(3 ... 6)
-                    .onChange(of: vm.workSamples) { _, new in
-                        if new.count > ProfileValidation.bioRange.upperBound {
-                            vm.workSamples = String(new.prefix(ProfileValidation.bioRange.upperBound))
+                TextField("XのユーザーID", text: $vm.xUserID)
+                    .textInputAutocapitalization(.never)
+                    .keyboardType(.asciiCapable)
+                    .autocorrectionDisabled()
+                    .onChange(of: vm.xUserID) { _, new in
+                        if new.count > ProfileValidation.snsUserIDRange.upperBound {
+                            vm.xUserID = String(new.prefix(ProfileValidation.snsUserIDRange.upperBound))
+                        }
+                    }
+                TextField("InstagramのユーザーID", text: $vm.instagramUserID)
+                    .textInputAutocapitalization(.never)
+                    .keyboardType(.asciiCapable)
+                    .autocorrectionDisabled()
+                    .onChange(of: vm.instagramUserID) { _, new in
+                        if new.count > ProfileValidation.snsUserIDRange.upperBound {
+                            vm.instagramUserID = String(new.prefix(ProfileValidation.snsUserIDRange.upperBound))
+                        }
+                    }
+                TextField("TikTokのユーザーID", text: $vm.tiktokUserID)
+                    .textInputAutocapitalization(.never)
+                    .keyboardType(.asciiCapable)
+                    .autocorrectionDisabled()
+                    .onChange(of: vm.tiktokUserID) { _, new in
+                        if new.count > ProfileValidation.snsUserIDRange.upperBound {
+                            vm.tiktokUserID = String(new.prefix(ProfileValidation.snsUserIDRange.upperBound))
                         }
                     }
             } header: {
-                Text("作例")
+                Text("SNSユーザーID")
             } footer: {
-                Text("\(vm.workSamples.count)/\(ProfileValidation.bioRange.upperBound)")
-                    .font(.caption2)
-            }
-
-            Section {
-                TextField("https://x.com/username", text: $vm.twitterURL)
-                    .textInputAutocapitalization(.never)
-                    .keyboardType(.URL)
-                    .autocorrectionDisabled()
-                    .onChange(of: vm.twitterURL) { _, new in
-                        if new.count > ProfileValidation.snsURLRange.upperBound {
-                            vm.twitterURL = String(new.prefix(ProfileValidation.snsURLRange.upperBound))
-                        }
-                    }
-                TextField("https://instagram.com/username", text: $vm.instagramURL)
-                    .textInputAutocapitalization(.never)
-                    .keyboardType(.URL)
-                    .autocorrectionDisabled()
-                    .onChange(of: vm.instagramURL) { _, new in
-                        if new.count > ProfileValidation.snsURLRange.upperBound {
-                            vm.instagramURL = String(new.prefix(ProfileValidation.snsURLRange.upperBound))
-                        }
-                    }
-                TextField("https://tiktok.com/@username", text: $vm.tiktokURL)
-                    .textInputAutocapitalization(.never)
-                    .keyboardType(.URL)
-                    .autocorrectionDisabled()
-                    .onChange(of: vm.tiktokURL) { _, new in
-                        if new.count > ProfileValidation.snsURLRange.upperBound {
-                            vm.tiktokURL = String(new.prefix(ProfileValidation.snsURLRange.upperBound))
-                        }
-                    }
-            } header: {
-                Text("SNSリンク")
-            } footer: {
-                Text("URLを入力すると交換時に相手に共有されます")
+                Text("各SNSのユーザーIDだけを入力してください")
                     .font(.caption2)
             }
 

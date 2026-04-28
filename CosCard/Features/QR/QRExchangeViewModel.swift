@@ -51,7 +51,7 @@ final class QRExchangeViewModel: ObservableObject {
                 ephemeralToken: token,
                 publicProfileId: publicId,
                 displayName: profile.displayName,
-                bioShort: profile.bio,
+                bioShort: nil,
                 primarySNSLabel: profile.primarySNSLabel,
                 primarySNSURL: profile.primarySNSURL,
                 profileVersion: profile.profileVersion,

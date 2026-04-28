@@ -90,7 +90,7 @@ final class ProfileRepository: ProfileRepositoryProtocol {
     private func resolvePrimarySNS(from draft: ProfileDraft) -> (label: String?, url: String?) {
         let twitter = draft.twitterURL?.trimmedCoscard() ?? ""
         if !twitter.isEmpty {
-            return ("Twitter", twitter)
+            return ("X", twitter)
         }
 
         let instagram = draft.instagramURL?.trimmedCoscard() ?? ""

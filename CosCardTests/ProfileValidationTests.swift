@@ -4,6 +4,21 @@ import XCTest
 
 @MainActor
 final class ProfileValidationTests: XCTestCase {
+    func testSNSUserIDValidationAcceptsPlainIDsOnly() {
+        XCTAssertTrue(ProfileValidation.validateSNSUserID("cos_user.01"))
+        XCTAssertTrue(ProfileValidation.validateSNSUserID("@cos_user"))
+        XCTAssertFalse(ProfileValidation.validateSNSUserID("cos user"))
+        XCTAssertFalse(ProfileValidation.validateSNSUserID("https://x.com/cos_user"))
+        XCTAssertFalse(ProfileValidation.validateSNSUserID("x.com/cos_user"))
+    }
+
+    func testSNSUserIDNormalizeExtractsIDFromLegacyURLs() {
+        XCTAssertEqual(SNSUserID.normalize("https://x.com/cos_user", service: .x), "cos_user")
+        XCTAssertEqual(SNSUserID.normalize("https://instagram.com/cos.photo/", service: .instagram), "cos.photo")
+        XCTAssertEqual(SNSUserID.normalize("https://www.tiktok.com/@cos_tok?lang=ja", service: .tiktok), "cos_tok")
+        XCTAssertEqual(SNSUserID.normalize("@plain_id", service: .x), "plain_id")
+    }
+
     func testExpiredEnvelopeThrows() async throws {
         let container = try ModelContainerProvider.makePreviewContainer()
         let context = ModelContext(container)

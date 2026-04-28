@@ -18,12 +18,6 @@ struct HistoryListView: View {
                         NavigationLink(value: p.id) {
                             VStack(alignment: .leading, spacing: 4) {
                                 Text(p.latestDisplayName).font(.headline)
-                                if let bio = p.latestBio, !bio.isEmpty {
-                                    Text(bio)
-                                        .font(.subheadline)
-                                        .foregroundStyle(.secondary)
-                                        .lineLimit(1)
-                                }
                                 HStack(spacing: AppSpacing.xs) {
                                     Text(p.lastMetAt.coscardShortString())
                                         .font(.caption)
@@ -45,7 +39,7 @@ struct HistoryListView: View {
             }
         }
         .navigationTitle("履歴")
-        .searchable(text: $vm.searchText, placement: .navigationBarDrawer(displayMode: .always), prompt: "名前・自己紹介・メモを検索")
+        .searchable(text: $vm.searchText, placement: .navigationBarDrawer(displayMode: .always), prompt: "名前・メモを検索")
         .onChange(of: vm.searchText) { _, _ in
             vm.searchTextDidChange()
         }
