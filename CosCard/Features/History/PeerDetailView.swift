@@ -35,8 +35,17 @@ struct PeerDetailView: View {
                                 Text(d.summary.latestDisplayName).font(.headline)
                             }
                         }
-                        if let snsValue = socialDisplayValue(label: d.latestSNSLabel, rawValue: d.latestSNSURL) {
-                            LabeledContent(d.latestSNSLabel ?? "SNS", value: snsValue)
+                        if let link = socialProfileLink(label: d.latestSNSLabel, rawValue: d.latestSNSURL) {
+                            LabeledContent(link.label) {
+                                Link(destination: link.url) {
+                                    HStack(spacing: 4) {
+                                        Text(link.displayValue)
+                                        Image(systemName: "arrow.up.forward.app")
+                                            .imageScale(.small)
+                                    }
+                                }
+                                .accessibilityHint("\(link.label)のユーザーページを開きます")
+                            }
                         }
                     }
                     Section("交換日・タグ") {
@@ -141,18 +150,24 @@ struct PeerDetailView: View {
         }
     }
 
-    private func socialDisplayValue(label: String?, rawValue: String?) -> String? {
-        let normalizedLabel = (label ?? "").lowercased()
-        if normalizedLabel.contains("insta") {
-            return SNSUserID.display(rawValue, service: .instagram)
+    private struct SocialProfileLink {
+        var label: String
+        var displayValue: String
+        var url: URL
+    }
+
+    private func socialProfileLink(label: String?, rawValue: String?) -> SocialProfileLink? {
+        let service = SNSUserID.service(label: label, rawValue: rawValue)
+        guard let url = SNSUserID.profileURL(rawValue, service: service) else { return nil }
+        let displayValue = SNSUserID.display(rawValue, service: service) ?? url.absoluteString
+        let resolvedLabel: String
+        if let service {
+            resolvedLabel = SNSUserID.displayName(for: service)
+        } else {
+            let trimmed = label?.trimmedCoscard() ?? ""
+            resolvedLabel = trimmed.isEmpty ? "SNS" : trimmed
         }
-        if normalizedLabel.contains("tik") {
-            return SNSUserID.display(rawValue, service: .tiktok)
-        }
-        if normalizedLabel.contains("x") || normalizedLabel.contains("twitter") {
-            return SNSUserID.display(rawValue, service: .x)
-        }
-        return SNSUserID.display(rawValue)
+        return SocialProfileLink(label: resolvedLabel, displayValue: displayValue, url: url)
     }
 }
 

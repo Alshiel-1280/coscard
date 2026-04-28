@@ -7,6 +7,39 @@ enum SNSUserID {
         case tiktok
     }
 
+    static func service(label: String?, rawValue: String? = nil) -> Service? {
+        let normalizedLabel = (label ?? "").lowercased()
+        if normalizedLabel.contains("insta") {
+            return .instagram
+        }
+        if normalizedLabel.contains("tik") {
+            return .tiktok
+        }
+        if normalizedLabel.contains("x") || normalizedLabel.contains("twitter") {
+            return .x
+        }
+
+        let text = (rawValue ?? "").trimmedCoscard().lowercased()
+        if text.contains("instagram.com") {
+            return .instagram
+        }
+        if text.contains("tiktok.com") {
+            return .tiktok
+        }
+        if text.contains("x.com") || text.contains("twitter.com") {
+            return .x
+        }
+        return nil
+    }
+
+    static func displayName(for service: Service) -> String {
+        switch service {
+        case .x: return "X"
+        case .instagram: return "Instagram"
+        case .tiktok: return "TikTok"
+        }
+    }
+
     static func normalize(_ value: String?, service: Service? = nil) -> String? {
         var text = (value ?? "").trimmedCoscard()
         guard !text.isEmpty else { return nil }
@@ -48,5 +81,32 @@ enum SNSUserID {
     static func display(_ value: String?, service: Service? = nil) -> String? {
         guard let id = normalize(value, service: service) else { return nil }
         return "@\(id)"
+    }
+
+    static func profileURL(_ value: String?, service: Service?) -> URL? {
+        guard let service else {
+            guard let text = value?.trimmedCoscard(),
+                  let url = URL(string: text),
+                  let scheme = url.scheme?.lowercased(),
+                  scheme == "https" || scheme == "http"
+            else { return nil }
+            return url
+        }
+        guard let id = normalize(value, service: service) else { return nil }
+
+        var components = URLComponents()
+        components.scheme = "https"
+        switch service {
+        case .x:
+            components.host = "x.com"
+            components.path = "/\(id)"
+        case .instagram:
+            components.host = "www.instagram.com"
+            components.path = "/\(id)/"
+        case .tiktok:
+            components.host = "www.tiktok.com"
+            components.path = "/@\(id)"
+        }
+        return components.url
     }
 }

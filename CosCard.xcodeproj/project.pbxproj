@@ -93,6 +93,7 @@
 		F2795F3D5FF87E7BB66C728B /* PeerRepository.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31CDAA006711679913D8617A /* PeerRepository.swift */; };
 		F60A9E74B2A8520C754C06A2 /* CosCardApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9C649CCEBB2C131FD14B620A /* CosCardApp.swift */; };
 		FA1D48F65159D03A94A043EE /* HistoryListViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 44AC312D088C37AF86C99388 /* HistoryListViewModel.swift */; };
+		FA6F8A2E8B593B14C771E42A /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = FA6F8A2D8B593B14C771E42A /* Assets.xcassets */; };
 		FB1C79DABFAF1EDD74EE611C /* MultipeerConnectivity.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 56A51409396311FA2977838B /* MultipeerConnectivity.framework */; };
 		FC642ACAD80B5D68516765DD /* MPCMessageEncoderTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 064A440B74B7E218DDE72698 /* MPCMessageEncoderTests.swift */; };
 /* End PBXBuildFile section */
@@ -197,6 +198,7 @@
 		F4F1BABA990F92FF76ABE15C /* RootView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RootView.swift; sourceTree = "<group>"; };
 		F6E15F3746A013EF6D7BF492 /* ModelContainerProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ModelContainerProvider.swift; sourceTree = "<group>"; };
 		F70B7BDF6CAC0A10355F8F62 /* HomeViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeViewModel.swift; sourceTree = "<group>"; };
+		FA6F8A2D8B593B14C771E42A /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		FB6C5C32A5DF7611940D763A /* ProfileRepositoryProtocol.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileRepositoryProtocol.swift; sourceTree = "<group>"; };
 		FCEE8111E78C448B2E301D41 /* OnboardingViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingViewModel.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -530,6 +532,7 @@
 		D94F33DA8077E5B63A06249E /* Resources */ = {
 			isa = PBXGroup;
 			children = (
+				FA6F8A2D8B593B14C771E42A /* Assets.xcassets */,
 				97EA36813BA0CDD911921D8B /* Info.plist */,
 			);
 			path = Resources;
@@ -585,6 +588,7 @@
 			buildPhases = (
 				C7A8A07274BA0E38BB988312 /* Sources */,
 				90435E30A4CCFC27239DCBBF /* Frameworks */,
+				FA6F8A2F8B593B14C771E42A /* Resources */,
 			);
 			buildRules = (
 			);
@@ -630,6 +634,17 @@
 			);
 		};
 /* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		FA6F8A2F8B593B14C771E42A /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				FA6F8A2E8B593B14C771E42A /* Assets.xcassets in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
 		587EC5ABFA23E938B2F557B0 /* Sources */ = {

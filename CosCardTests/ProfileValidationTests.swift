@@ -19,6 +19,18 @@ final class ProfileValidationTests: XCTestCase {
         XCTAssertEqual(SNSUserID.normalize("@plain_id", service: .x), "plain_id")
     }
 
+    func testSNSUserIDProfileURLBuildsServiceProfilePages() {
+        XCTAssertEqual(SNSUserID.profileURL("@cos_user", service: .x)?.absoluteString, "https://x.com/cos_user")
+        XCTAssertEqual(SNSUserID.profileURL("cos.photo", service: .instagram)?.absoluteString, "https://www.instagram.com/cos.photo/")
+        XCTAssertEqual(SNSUserID.profileURL("@cos_tok", service: .tiktok)?.absoluteString, "https://www.tiktok.com/@cos_tok")
+    }
+
+    func testSNSUserIDServiceCanBeResolvedFromLabelOrLegacyURL() {
+        XCTAssertEqual(SNSUserID.service(label: "Instagram", rawValue: nil), .instagram)
+        XCTAssertEqual(SNSUserID.service(label: nil, rawValue: "https://www.tiktok.com/@cos_tok"), .tiktok)
+        XCTAssertEqual(SNSUserID.service(label: "Twitter", rawValue: nil), .x)
+    }
+
     func testExpiredEnvelopeThrows() async throws {
         let container = try ModelContainerProvider.makePreviewContainer()
         let context = ModelContext(container)
