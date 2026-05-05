@@ -7,10 +7,15 @@ final class PeerContactEntity {
     var localPeerKey: String
     var publicProfileId: String?
     var latestDisplayName: String
+    var latestCosplayCharacterName: String?
     var latestBio: String?
     var latestSNSLabel: String?
     var latestSNSURL: String?
+    var latestTwitterURL: String?
+    var latestInstagramURL: String?
+    var latestTiktokURL: String?
     @Attribute(.externalStorage) var latestIconThumbnailData: Data?
+    @Attribute(.externalStorage) var latestBusinessCardImageData: Data?
     var firstMetAt: Date
     var lastMetAt: Date
     var lastEventTag: String?
@@ -29,10 +34,15 @@ final class PeerContactEntity {
         localPeerKey: String,
         publicProfileId: String? = nil,
         latestDisplayName: String,
+        latestCosplayCharacterName: String? = nil,
         latestBio: String? = nil,
         latestSNSLabel: String? = nil,
         latestSNSURL: String? = nil,
+        latestTwitterURL: String? = nil,
+        latestInstagramURL: String? = nil,
+        latestTiktokURL: String? = nil,
         latestIconThumbnailData: Data? = nil,
+        latestBusinessCardImageData: Data? = nil,
         firstMetAt: Date = .now,
         lastMetAt: Date = .now,
         lastEventTag: String? = nil,
@@ -47,10 +57,15 @@ final class PeerContactEntity {
         self.localPeerKey = localPeerKey
         self.publicProfileId = publicProfileId
         self.latestDisplayName = latestDisplayName
+        self.latestCosplayCharacterName = latestCosplayCharacterName
         self.latestBio = latestBio
         self.latestSNSLabel = latestSNSLabel
         self.latestSNSURL = latestSNSURL
+        self.latestTwitterURL = latestTwitterURL
+        self.latestInstagramURL = latestInstagramURL
+        self.latestTiktokURL = latestTiktokURL
         self.latestIconThumbnailData = latestIconThumbnailData
+        self.latestBusinessCardImageData = latestBusinessCardImageData
         self.firstMetAt = firstMetAt
         self.lastMetAt = lastMetAt
         self.lastEventTag = lastEventTag

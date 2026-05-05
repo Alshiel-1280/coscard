@@ -141,11 +141,16 @@ final class MPCManager: NSObject, NearbyServiceProtocol {
             ephemeralToken: profile.ephemeralToken,
             publicProfileId: profile.publicProfileId,
             displayName: profile.displayName,
+            cosplayCharacterName: profile.cosplayCharacterName,
             bioShort: profile.bioShort,
             primarySNSLabel: profile.primarySNSLabel,
             primarySNSURL: profile.primarySNSURL,
+            twitterURL: profile.twitterURL,
+            instagramURL: profile.instagramURL,
+            tiktokURL: profile.tiktokURL,
             profileVersion: profile.profileVersion,
-            iconThumbnailData: profile.iconThumbnailData
+            iconThumbnailData: profile.iconThumbnailData,
+            businessCardImageData: profile.businessCardImageData
         )
         let expiresAt = Date().addingTimeInterval(180)
         try sendToConnectedPeers(

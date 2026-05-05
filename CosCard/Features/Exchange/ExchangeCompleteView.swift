@@ -1,7 +1,11 @@
 import SwiftUI
+import UIKit
 
 struct ExchangeCompleteView: View {
     let peerName: String
+    var peerCosplayCharacterName: String?
+    var peerIconData: Data?
+    var peerBusinessCardImageData: Data?
     var isDuplicateExchange = false
     @State private var memo = ""
     @State private var eventTag = ""
@@ -10,10 +14,16 @@ struct ExchangeCompleteView: View {
 
     init(
         peerName: String,
+        peerCosplayCharacterName: String? = nil,
+        peerIconData: Data? = nil,
+        peerBusinessCardImageData: Data? = nil,
         isDuplicateExchange: Bool = false,
         onDone: @escaping (_ memo: String?, _ eventTag: String?) -> Void
     ) {
         self.peerName = peerName
+        self.peerCosplayCharacterName = peerCosplayCharacterName
+        self.peerIconData = peerIconData
+        self.peerBusinessCardImageData = peerBusinessCardImageData
         self.isDuplicateExchange = isDuplicateExchange
         self.onDone = { memo, eventTag, _ in
             onDone(memo, eventTag)
@@ -22,10 +32,16 @@ struct ExchangeCompleteView: View {
 
     init(
         peerName: String,
+        peerCosplayCharacterName: String? = nil,
+        peerIconData: Data? = nil,
+        peerBusinessCardImageData: Data? = nil,
         isDuplicateExchange: Bool = false,
         onDone: @escaping (_ memo: String?, _ eventTag: String?, _ duplicateChoice: DuplicateExchangeSaveChoice) -> Void
     ) {
         self.peerName = peerName
+        self.peerCosplayCharacterName = peerCosplayCharacterName
+        self.peerIconData = peerIconData
+        self.peerBusinessCardImageData = peerBusinessCardImageData
         self.isDuplicateExchange = isDuplicateExchange
         self.onDone = onDone
     }
@@ -40,9 +56,20 @@ struct ExchangeCompleteView: View {
                         .accessibilityHidden(true)
                     Text("交換完了")
                         .font(.title2.bold())
-                    Text(peerName)
-                        .font(.headline)
-                        .foregroundStyle(.secondary)
+                    HStack(spacing: AppSpacing.sm) {
+                        peerIcon
+                        VStack(alignment: .leading, spacing: 4) {
+                            Text(peerName)
+                                .font(.headline)
+                            if let characterName = normalized(peerCosplayCharacterName) {
+                                Text(characterName)
+                                    .font(.subheadline)
+                                    .foregroundStyle(.secondary)
+                            }
+                        }
+                    }
+                    .frame(maxWidth: .infinity, alignment: .center)
+                    peerBusinessCardImage
                 }
                 .frame(maxWidth: .infinity)
                 .padding(.vertical, AppSpacing.md)
@@ -91,6 +118,37 @@ struct ExchangeCompleteView: View {
         let m = memo.trimmedCoscard()
         let t = eventTag.trimmedCoscard()
         onDone(m.isEmpty ? nil : m, t.isEmpty ? nil : t, duplicateChoice)
+    }
+
+    @ViewBuilder
+    private var peerIcon: some View {
+        if let peerIconData, let image = UIImage(data: peerIconData) {
+            Image(uiImage: image)
+                .resizable()
+                .scaledToFill()
+                .frame(width: 48, height: 48)
+                .clipShape(Circle())
+                .accessibilityLabel("相手のアイコン")
+        }
+    }
+
+    @ViewBuilder
+    private var peerBusinessCardImage: some View {
+        if let peerBusinessCardImageData, let image = UIImage(data: peerBusinessCardImageData) {
+            Image(uiImage: image)
+                .resizable()
+                .scaledToFit()
+                .frame(maxWidth: .infinity)
+                .frame(maxHeight: 220)
+                .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
+                .accessibilityLabel("相手の名刺画像")
+        }
+    }
+
+    private func normalized(_ value: String?) -> String? {
+        guard let value else { return nil }
+        let trimmed = value.trimmedCoscard()
+        return trimmed.isEmpty ? nil : trimmed
     }
 }
 

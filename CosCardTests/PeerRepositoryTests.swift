@@ -36,6 +36,58 @@ final class PeerRepositoryTests: XCTestCase {
         XCTAssertEqual(peers.first?.memo, "メモ")
     }
 
+    func testUpsertStoresAllSNSUserIDsForDetail() async throws {
+        let iconData = Data([0x01, 0x02, 0x03])
+        let businessCard = Data([0x10, 0x20, 0x30, 0x40])
+        let profile = LightweightProfile(
+            ephemeralToken: "tok-sns",
+            publicProfileId: "pid-sns",
+            displayName: "SNSテスト",
+            cosplayCharacterName: "キャラA",
+            bioShort: "SNS bio",
+            primarySNSLabel: "X",
+            primarySNSURL: "cos_x",
+            twitterURL: "cos_x",
+            instagramURL: "cos_ig",
+            tiktokURL: "cos_tt",
+            profileVersion: 1,
+            iconThumbnailData: iconData,
+            businessCardImageData: businessCard
+        )
+        let key = LocalPeerKey.make(from: profile)
+
+        let peerId = try await repo.upsertPeerFromExchange(
+            localPeerKey: key,
+            received: profile,
+            memo: nil,
+            eventTag: nil
+        )
+
+        let detail = try await repo.fetchPeer(id: peerId)
+        XCTAssertEqual(detail?.latestCosplayCharacterName, "キャラA")
+        XCTAssertEqual(detail?.latestSNSLabel, "X")
+        XCTAssertEqual(detail?.latestSNSURL, "cos_x")
+        XCTAssertEqual(detail?.latestTwitterURL, "cos_x")
+        XCTAssertEqual(detail?.latestInstagramURL, "cos_ig")
+        XCTAssertEqual(detail?.latestTiktokURL, "cos_tt")
+        XCTAssertEqual(detail?.latestIconThumbnailData, iconData)
+        XCTAssertEqual(detail?.latestBusinessCardImageData, businessCard)
+
+        let snapshots = try fetchSnapshots(ownerReferenceId: peerId)
+        XCTAssertEqual(snapshots.count, 1)
+        XCTAssertEqual(snapshots.first?.displayName, "SNSテスト")
+        XCTAssertEqual(snapshots.first?.cosplayCharacterName, "キャラA")
+        XCTAssertEqual(snapshots.first?.bio, "SNS bio")
+        XCTAssertEqual(snapshots.first?.primarySNSLabel, "X")
+        XCTAssertEqual(snapshots.first?.primarySNSURL, "cos_x")
+        XCTAssertEqual(snapshots.first?.twitterURL, "cos_x")
+        XCTAssertEqual(snapshots.first?.instagramURL, "cos_ig")
+        XCTAssertEqual(snapshots.first?.tiktokURL, "cos_tt")
+        XCTAssertEqual(snapshots.first?.iconThumbnailData, iconData)
+        XCTAssertEqual(snapshots.first?.businessCardImageData, businessCard)
+        XCTAssertEqual(snapshots.first?.profileVersion, 1)
+    }
+
     func testHiddenPeersNotInList() async throws {
         let profile = LightweightProfile(
             ephemeralToken: "tok-h",
@@ -196,5 +248,13 @@ final class PeerRepositoryTests: XCTestCase {
 
         let detail = try await repo.fetchPeer(id: peerId)
         XCTAssertEqual(detail?.summary.memo, "更新メモ")
+    }
+
+    private func fetchSnapshots(ownerReferenceId: UUID) throws -> [LightweightProfileSnapshotEntity] {
+        let descriptor = FetchDescriptor<LightweightProfileSnapshotEntity>(
+            predicate: #Predicate { $0.ownerReferenceId == ownerReferenceId },
+            sortBy: [SortDescriptor(\.capturedAt, order: .forward)]
+        )
+        return try context.fetch(descriptor)
     }
 }

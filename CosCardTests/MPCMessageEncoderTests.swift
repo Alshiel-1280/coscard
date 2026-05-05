@@ -24,11 +24,16 @@ final class MPCMessageEncoderTests: XCTestCase {
             ephemeralToken: "abc",
             publicProfileId: "pub-1",
             displayName: "Test",
+            cosplayCharacterName: "Hero",
             bioShort: "bio",
             primarySNSLabel: "X",
             primarySNSURL: "https://example.com",
+            twitterURL: "cos_x",
+            instagramURL: "cos_ig",
+            tiktokURL: "cos_tt",
             profileVersion: 4,
-            iconThumbnailData: nil
+            iconThumbnailData: nil,
+            businessCardImageData: Data([0x01, 0x02, 0x03])
         )
         let exp = Date().addingTimeInterval(120)
         let raw = try MPCMessageEncoder.encodeEnvelope(
@@ -48,7 +53,39 @@ final class MPCMessageEncoderTests: XCTestCase {
         XCTAssertEqual(decodedPayload.ephemeralToken, "abc")
         XCTAssertEqual(decodedPayload.publicProfileId, "pub-1")
         XCTAssertEqual(decodedPayload.displayName, "Test")
+        XCTAssertEqual(decodedPayload.cosplayCharacterName, "Hero")
+        XCTAssertEqual(decodedPayload.bioShort, "bio")
+        XCTAssertEqual(decodedPayload.primarySNSLabel, "X")
+        XCTAssertEqual(decodedPayload.primarySNSURL, "https://example.com")
+        XCTAssertEqual(decodedPayload.twitterURL, "cos_x")
+        XCTAssertEqual(decodedPayload.instagramURL, "cos_ig")
+        XCTAssertEqual(decodedPayload.tiktokURL, "cos_tt")
         XCTAssertEqual(decodedPayload.profileVersion, 4)
+        XCTAssertEqual(decodedPayload.businessCardImageData, Data([0x01, 0x02, 0x03]))
+    }
+
+    func testLightweightProfilePayloadDecodesLegacyPayload_withoutDedicatedSNSFields() throws {
+        let data = """
+        {
+          "ephemeralToken": "abc",
+          "publicProfileId": "pub-1",
+          "displayName": "Legacy",
+          "bioShort": null,
+          "primarySNSLabel": "X",
+          "primarySNSURL": "legacy_x",
+          "profileVersion": 1,
+          "iconThumbnailData": null
+        }
+        """.data(using: .utf8)!
+
+        let payload = try JSONDecoder().decode(LightweightProfilePayload.self, from: data)
+
+        XCTAssertEqual(payload.primarySNSURL, "legacy_x")
+        XCTAssertNil(payload.twitterURL)
+        XCTAssertNil(payload.instagramURL)
+        XCTAssertNil(payload.tiktokURL)
+        XCTAssertNil(payload.cosplayCharacterName)
+        XCTAssertNil(payload.businessCardImageData)
     }
 
     func testEncodeEnvelope_usesCurrentSchemaVersionAndPayloadBase64() throws {

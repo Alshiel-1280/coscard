@@ -30,21 +30,39 @@ struct PeerDetailView: View {
                                     .scaledToFill()
                                     .frame(width: 64, height: 64)
                                     .clipShape(Circle())
+                                    .accessibilityLabel("相手のアイコン")
                             }
                             VStack(alignment: .leading, spacing: 4) {
                                 Text(d.summary.latestDisplayName).font(.headline)
+                                if let characterName = normalized(d.latestCosplayCharacterName) {
+                                    Text(characterName)
+                                        .font(.subheadline)
+                                        .foregroundStyle(.secondary)
+                                }
                             }
                         }
-                        if let link = socialProfileLink(label: d.latestSNSLabel, rawValue: d.latestSNSURL) {
-                            LabeledContent(link.label) {
-                                Link(destination: link.url) {
-                                    HStack(spacing: 4) {
-                                        Text(link.displayValue)
-                                        Image(systemName: "arrow.up.forward.app")
-                                            .imageScale(.small)
+                        if let data = d.latestBusinessCardImageData, let image = UIImage(data: data) {
+                            Image(uiImage: image)
+                                .resizable()
+                                .scaledToFit()
+                                .frame(maxWidth: .infinity)
+                                .frame(maxHeight: 240)
+                                .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
+                                .accessibilityLabel("相手の名刺画像")
+                        }
+                        let socialLinks = socialProfileLinks(from: d)
+                        if !socialLinks.isEmpty {
+                            ForEach(socialLinks) { link in
+                                LabeledContent(link.label) {
+                                    Link(destination: link.url) {
+                                        HStack(spacing: 4) {
+                                            Text(link.displayValue)
+                                            Image(systemName: "arrow.up.forward.app")
+                                                .imageScale(.small)
+                                        }
                                     }
+                                    .accessibilityHint("\(link.label)のユーザーページを開きます")
                                 }
-                                .accessibilityHint("\(link.label)のユーザーページを開きます")
                             }
                         }
                     }
@@ -150,14 +168,47 @@ struct PeerDetailView: View {
         }
     }
 
-    private struct SocialProfileLink {
+    private struct SocialProfileLink: Identifiable {
+        var id: String
+        var service: SNSUserID.Service?
         var label: String
         var displayValue: String
         var url: URL
     }
 
+    private func socialProfileLinks(from detail: PeerDetail) -> [SocialProfileLink] {
+        var links: [SocialProfileLink] = []
+        let serviceValues: [(SNSUserID.Service, String?)] = [
+            (.x, detail.latestTwitterURL),
+            (.instagram, detail.latestInstagramURL),
+            (.tiktok, detail.latestTiktokURL),
+        ]
+
+        for (service, rawValue) in serviceValues {
+            if let link = socialProfileLink(label: SNSUserID.displayName(for: service), rawValue: rawValue, forcedService: service) {
+                links.append(link)
+            }
+        }
+
+        if let legacyLink = socialProfileLink(label: detail.latestSNSLabel, rawValue: detail.latestSNSURL),
+           legacyLink.service.map({ service in links.contains { $0.service == service } }) != true
+        {
+            links.append(legacyLink)
+        }
+
+        return links
+    }
+
     private func socialProfileLink(label: String?, rawValue: String?) -> SocialProfileLink? {
-        let service = SNSUserID.service(label: label, rawValue: rawValue)
+        socialProfileLink(label: label, rawValue: rawValue, forcedService: nil)
+    }
+
+    private func socialProfileLink(
+        label: String?,
+        rawValue: String?,
+        forcedService: SNSUserID.Service?
+    ) -> SocialProfileLink? {
+        let service = forcedService ?? SNSUserID.service(label: label, rawValue: rawValue)
         guard let url = SNSUserID.profileURL(rawValue, service: service) else { return nil }
         let displayValue = SNSUserID.display(rawValue, service: service) ?? url.absoluteString
         let resolvedLabel: String
@@ -167,7 +218,14 @@ struct PeerDetailView: View {
             let trimmed = label?.trimmedCoscard() ?? ""
             resolvedLabel = trimmed.isEmpty ? "SNS" : trimmed
         }
-        return SocialProfileLink(label: resolvedLabel, displayValue: displayValue, url: url)
+        let id = service.map { SNSUserID.displayName(for: $0) } ?? "\(resolvedLabel)-\(url.absoluteString)"
+        return SocialProfileLink(id: id, service: service, label: resolvedLabel, displayValue: displayValue, url: url)
+    }
+
+    private func normalized(_ value: String?) -> String? {
+        guard let value else { return nil }
+        let trimmed = value.trimmedCoscard()
+        return trimmed.isEmpty ? nil : trimmed
     }
 }
 

@@ -19,6 +19,11 @@ struct MyCardView: View {
                 } label: {
                     Label("プロフィールを編集", systemImage: "pencil")
                 }
+                NavigationLink {
+                    BusinessCardHistoryView()
+                } label: {
+                    Label("名刺履歴", systemImage: "rectangle.stack")
+                }
             }
         }
         .scrollContentBackground(.hidden)
@@ -47,8 +52,19 @@ struct MyCardView: View {
             if let p = vm.profile {
                 HStack(spacing: AppSpacing.md) {
                     iconView(data: p.iconThumbnailData)
-                    Text(p.displayName)
-                        .font(.title2.weight(.bold))
+                    VStack(alignment: .leading, spacing: 4) {
+                        Text(p.displayName)
+                            .font(.title2.weight(.bold))
+                        if let characterName = normalized(p.cosplayCharacterName) {
+                            Text(characterName)
+                                .font(.subheadline.weight(.medium))
+                                .foregroundStyle(.secondary)
+                        }
+                    }
+                }
+                if let data = p.businessCardImageData {
+                    businessCardImage(data: data)
+                        .padding(.top, AppSpacing.sm)
                 }
                 let links = socialLinks(from: p)
                 if !links.isEmpty {
@@ -81,6 +97,7 @@ struct MyCardView: View {
                 .scaledToFill()
                 .frame(width: 56, height: 56)
                 .clipShape(Circle())
+                .accessibilityLabel("自分のアイコン")
         } else {
             Circle()
                 .fill(AppColors.card)
@@ -89,6 +106,20 @@ struct MyCardView: View {
                     Image(systemName: "person.fill")
                         .foregroundStyle(.secondary)
                 }
+                .accessibilityLabel("自分のアイコン未設定")
+        }
+    }
+
+    @ViewBuilder
+    private func businessCardImage(data: Data) -> some View {
+        if let image = UIImage(data: data) {
+            Image(uiImage: image)
+                .resizable()
+                .scaledToFit()
+                .frame(maxWidth: .infinity)
+                .frame(maxHeight: 220)
+                .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
+                .accessibilityLabel("自分の名刺画像")
         }
     }
 

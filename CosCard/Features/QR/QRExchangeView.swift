@@ -81,6 +81,9 @@ struct QRExchangeView: View {
             NavigationStack {
                 ExchangeCompleteView(
                     peerName: vm.pendingScanPeerName,
+                    peerCosplayCharacterName: vm.pendingScanCosplayCharacterName,
+                    peerIconData: vm.pendingScanIconData,
+                    peerBusinessCardImageData: vm.pendingScanBusinessCardImageData,
                     isDuplicateExchange: vm.pendingScanIsDuplicate
                 ) { memo, tag, duplicateChoice in
                     Task {

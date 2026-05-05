@@ -16,11 +16,17 @@ extension String {
 
 enum ProfileValidation {
     static let displayNameRange = 1 ... 24
+    static let cosplayCharacterNameRange = 0 ... 40
     static let snsUserIDRange = 0 ... 50
 
     static func validateDisplayName(_ s: String) -> Bool {
         let t = s.trimmedCoscard()
         return displayNameRange.contains(t.count)
+    }
+
+    static func validateCosplayCharacterName(_ s: String?) -> Bool {
+        let t = (s ?? "").trimmedCoscard()
+        return cosplayCharacterNameRange.contains(t.count)
     }
 
     static func validateSNSUserID(_ s: String?) -> Bool {

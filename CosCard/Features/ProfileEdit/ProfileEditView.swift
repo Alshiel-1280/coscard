@@ -7,22 +7,34 @@ struct ProfileEditView: View {
     @StateObject private var vm = ProfileEditViewModel()
     @Environment(\.dismiss) private var dismiss
     @State private var selectedPhoto: PhotosPickerItem?
+    @State private var selectedBusinessCardPhoto: PhotosPickerItem?
     @State private var isSaving = false
+    @State private var draft = ProfileEditFormDraft()
+    @State private var iconPreviewImage: UIImage?
+    @State private var businessCardPreviewImage: UIImage?
 
     var body: some View {
         Form {
             Section {
-                TextField("1〜24文字", text: $vm.displayName)
-                    .onChange(of: vm.displayName) { _, new in
-                        if new.count > ProfileValidation.displayNameRange.upperBound {
-                            vm.displayName = String(new.prefix(ProfileValidation.displayNameRange.upperBound))
-                        }
-                    }
+                TextField("1〜24文字", text: $draft.displayName)
             } header: {
                 Text("ユーザーネーム")
             } footer: {
-                Text("\(vm.displayName.count)/\(ProfileValidation.displayNameRange.upperBound)")
-                    .font(.caption2)
+                characterCounter(
+                    count: draft.displayName.count,
+                    max: ProfileValidation.displayNameRange.upperBound
+                )
+            }
+
+            Section {
+                TextField("例: 初音ミク", text: $draft.cosplayCharacterName)
+            } header: {
+                Text("コスプレしているキャラ名")
+            } footer: {
+                characterCounter(
+                    count: draft.cosplayCharacterName.count,
+                    max: ProfileValidation.cosplayCharacterNameRange.upperBound
+                )
             }
 
             Section("アイコン") {
@@ -35,40 +47,42 @@ struct ProfileEditView: View {
                         if vm.iconThumbnailData != nil {
                             Button("アイコンを削除", role: .destructive) {
                                 vm.removeIcon()
+                                iconPreviewImage = nil
                             }
                         }
                     }
                 }
             }
 
+            Section("名刺画像") {
+                businessCardPreview
+                HStack {
+                    PhotosPicker(selection: $selectedBusinessCardPhoto, matching: .images) {
+                        Label("名刺画像を選択", systemImage: "rectangle.stack")
+                    }
+                    if vm.businessCardImageData != nil {
+                        Spacer()
+                        Button("削除", role: .destructive) {
+                            vm.removeBusinessCard()
+                            businessCardPreviewImage = nil
+                        }
+                    }
+                }
+            }
+
             Section {
-                TextField("XのユーザーID", text: $vm.xUserID)
+                TextField("XのユーザーID", text: $draft.xUserID)
                     .textInputAutocapitalization(.never)
                     .keyboardType(.asciiCapable)
                     .autocorrectionDisabled()
-                    .onChange(of: vm.xUserID) { _, new in
-                        if new.count > ProfileValidation.snsUserIDRange.upperBound {
-                            vm.xUserID = String(new.prefix(ProfileValidation.snsUserIDRange.upperBound))
-                        }
-                    }
-                TextField("InstagramのユーザーID", text: $vm.instagramUserID)
+                TextField("InstagramのユーザーID", text: $draft.instagramUserID)
                     .textInputAutocapitalization(.never)
                     .keyboardType(.asciiCapable)
                     .autocorrectionDisabled()
-                    .onChange(of: vm.instagramUserID) { _, new in
-                        if new.count > ProfileValidation.snsUserIDRange.upperBound {
-                            vm.instagramUserID = String(new.prefix(ProfileValidation.snsUserIDRange.upperBound))
-                        }
-                    }
-                TextField("TikTokのユーザーID", text: $vm.tiktokUserID)
+                TextField("TikTokのユーザーID", text: $draft.tiktokUserID)
                     .textInputAutocapitalization(.never)
                     .keyboardType(.asciiCapable)
                     .autocorrectionDisabled()
-                    .onChange(of: vm.tiktokUserID) { _, new in
-                        if new.count > ProfileValidation.snsUserIDRange.upperBound {
-                            vm.tiktokUserID = String(new.prefix(ProfileValidation.snsUserIDRange.upperBound))
-                        }
-                    }
             } header: {
                 Text("SNSユーザーID")
             } footer: {
@@ -91,33 +105,36 @@ struct ProfileEditView: View {
                     Button("保存") {
                         isSaving = true
                         Task {
-                            if await vm.save() {
+                            if await vm.save(draft) {
                                 dismiss()
                             } else {
                                 isSaving = false
                             }
                         }
                     }
-                    .disabled(vm.displayName.trimmedCoscard().isEmpty)
+                    .disabled(!ProfileValidation.validateDisplayName(draft.displayName))
                 }
             }
         }
         .navigationTitle("プロフィール編集")
         .task {
             vm.attach(env)
-            await vm.load()
+            draft = await vm.load()
+            refreshPreviewImages()
         }
         .task(id: selectedPhoto) { await loadSelectedPhoto() }
+        .task(id: selectedBusinessCardPhoto) { await loadSelectedBusinessCardPhoto() }
     }
 
     @ViewBuilder
     private var iconPreview: some View {
-        if let data = vm.iconThumbnailData, let image = UIImage(data: data) {
+        if let image = iconPreviewImage {
             Image(uiImage: image)
                 .resizable()
                 .scaledToFill()
                 .frame(width: 72, height: 72)
                 .clipShape(Circle())
+                .accessibilityLabel("アイコン画像")
         } else {
             Circle()
                 .fill(AppColors.card)
@@ -126,7 +143,47 @@ struct ProfileEditView: View {
                     Image(systemName: "person.fill")
                         .foregroundStyle(.secondary)
                 }
+                .accessibilityLabel("アイコン未設定")
         }
+    }
+
+    @ViewBuilder
+    private var businessCardPreview: some View {
+        if let image = businessCardPreviewImage {
+            Image(uiImage: image)
+                .resizable()
+                .scaledToFit()
+                .frame(maxWidth: .infinity)
+                .frame(maxHeight: 220)
+                .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
+                .accessibilityLabel("名刺画像")
+        } else {
+            RoundedRectangle(cornerRadius: 8, style: .continuous)
+                .fill(AppColors.card)
+                .frame(maxWidth: .infinity)
+                .frame(height: 140)
+                .overlay {
+                    VStack(spacing: AppSpacing.xs) {
+                        Image(systemName: "rectangle.stack")
+                            .font(.title2)
+                        Text("名刺画像未登録")
+                            .font(.caption)
+                    }
+                    .foregroundStyle(.secondary)
+                }
+                .accessibilityLabel("名刺画像未登録")
+        }
+    }
+
+    private func characterCounter(count: Int, max: Int) -> some View {
+        Text("\(count)/\(max)")
+            .font(.caption2)
+            .foregroundStyle(count > max ? AppColors.danger : Color.secondary)
+    }
+
+    private func refreshPreviewImages() {
+        iconPreviewImage = vm.iconThumbnailData.flatMap(UIImage.init(data:))
+        businessCardPreviewImage = vm.businessCardImageData.flatMap(UIImage.init(data:))
     }
 
     private func loadSelectedPhoto() async {
@@ -134,10 +191,23 @@ struct ProfileEditView: View {
         do {
             let data = try await selectedPhoto.loadTransferable(type: Data.self)
             vm.updateIcon(rawData: data)
+            iconPreviewImage = vm.iconThumbnailData.flatMap(UIImage.init(data:))
         } catch {
             vm.errorMessage = error.localizedDescription
         }
         self.selectedPhoto = nil
+    }
+
+    private func loadSelectedBusinessCardPhoto() async {
+        guard let selectedBusinessCardPhoto else { return }
+        do {
+            let data = try await selectedBusinessCardPhoto.loadTransferable(type: Data.self)
+            vm.updateBusinessCard(rawData: data)
+            businessCardPreviewImage = vm.businessCardImageData.flatMap(UIImage.init(data:))
+        } catch {
+            vm.errorMessage = error.localizedDescription
+        }
+        self.selectedBusinessCardPhoto = nil
     }
 }
 

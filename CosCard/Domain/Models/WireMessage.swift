@@ -67,11 +67,16 @@ struct LightweightProfilePayload: Codable, Sendable {
     var ephemeralToken: String
     var publicProfileId: String?
     var displayName: String
+    var cosplayCharacterName: String? = nil
     var bioShort: String?
     var primarySNSLabel: String?
     var primarySNSURL: String?
+    var twitterURL: String? = nil
+    var instagramURL: String? = nil
+    var tiktokURL: String? = nil
     var profileVersion: Int
     var iconThumbnailData: Data?
+    var businessCardImageData: Data? = nil
 }
 
 struct AckPayload: Codable, Sendable {

@@ -11,6 +11,9 @@ final class QRExchangeViewModel: ObservableObject {
     @Published var showScanner = false
     @Published var showScanComplete = false
     @Published var pendingScanPeerName = ""
+    @Published var pendingScanCosplayCharacterName: String?
+    @Published var pendingScanIconData: Data?
+    @Published var pendingScanBusinessCardImageData: Data?
     @Published var pendingScanIsDuplicate = false
 
     private var env: AppEnvironment?
@@ -51,11 +54,17 @@ final class QRExchangeViewModel: ObservableObject {
                 ephemeralToken: token,
                 publicProfileId: publicId,
                 displayName: profile.displayName,
+                cosplayCharacterName: profile.cosplayCharacterName,
                 bioShort: nil,
                 primarySNSLabel: profile.primarySNSLabel,
                 primarySNSURL: profile.primarySNSURL,
+                twitterURL: profile.twitterURL,
+                instagramURL: profile.instagramURL,
+                tiktokURL: profile.tiktokURL,
                 profileVersion: profile.profileVersion,
-                iconThumbnailData: nil
+                iconThumbnailData: nil,
+                // QR はBase64化したEnvelope全体を載せるため、画像系データは容量を抑える目的で送らない。
+                businessCardImageData: nil
             )
             let expiresAt = Date().addingTimeInterval(180)
             let data = try MPCMessageEncoder.encodeEnvelope(
@@ -69,7 +78,7 @@ final class QRExchangeViewModel: ObservableObject {
             qrImage = QRCodeGenerator.makeImage(from: b64, dimension: 240)
             if qrImage == nil {
                 errorMessage =
-                    "QR を生成できません。プロフィールやアイコンのデータ量が大きすぎる可能性があります。プロフィール編集で画像を小さくするか、項目を減らしてください。"
+                    "QR を生成できません。プロフィールやSNSの文字数を減らしてから再試行してください。"
             }
         } catch {
             errorMessage = (error as? LocalizedError)?.errorDescription ?? error.localizedDescription
@@ -81,6 +90,9 @@ final class QRExchangeViewModel: ObservableObject {
         errorMessage = nil
         scanSuccessMessage = nil
         pendingScanIsDuplicate = false
+        pendingScanCosplayCharacterName = nil
+        pendingScanIconData = nil
+        pendingScanBusinessCardImageData = nil
         let trimmed = b64.trimmingCharacters(in: .whitespacesAndNewlines)
         guard let raw = Data(base64Encoded: trimmed) else {
             errorMessage = "読み取ったコードが CosCard の交換用データではありません"
@@ -106,11 +118,16 @@ final class QRExchangeViewModel: ObservableObject {
                 ephemeralToken: p.ephemeralToken,
                 publicProfileId: p.publicProfileId,
                 displayName: p.displayName,
+                cosplayCharacterName: p.cosplayCharacterName,
                 bioShort: p.bioShort,
                 primarySNSLabel: p.primarySNSLabel,
                 primarySNSURL: p.primarySNSURL,
+                twitterURL: p.twitterURL,
+                instagramURL: p.instagramURL,
+                tiktokURL: p.tiktokURL,
                 profileVersion: p.profileVersion,
-                iconThumbnailData: p.iconThumbnailData
+                iconThumbnailData: p.iconThumbnailData,
+                businessCardImageData: p.businessCardImageData
             )
             if try await isBlocked(peer) {
                 errorMessage = "ブロック中の相手です。履歴のブロックリストから解除してから保存してください。"
@@ -130,6 +147,9 @@ final class QRExchangeViewModel: ObservableObject {
             scannedSessionId = envelope.exchangeId
             scannedExchangeIds.insert(envelope.exchangeId)
             pendingScanPeerName = p.displayName
+            pendingScanCosplayCharacterName = p.cosplayCharacterName
+            pendingScanIconData = p.iconThumbnailData
+            pendingScanBusinessCardImageData = p.businessCardImageData
             pendingScanIsDuplicate = duplicateCheck.isDuplicate
             showScanComplete = true
         } catch {
@@ -165,12 +185,18 @@ final class QRExchangeViewModel: ObservableObject {
             scannedProfile = nil
             scannedSessionId = nil
             pendingScanIsDuplicate = false
+            pendingScanCosplayCharacterName = nil
+            pendingScanIconData = nil
+            pendingScanBusinessCardImageData = nil
         } catch {
             errorMessage = (error as? LocalizedError)?.errorDescription ?? error.localizedDescription
             showScanComplete = false
             scannedProfile = nil
             scannedSessionId = nil
             pendingScanIsDuplicate = false
+            pendingScanCosplayCharacterName = nil
+            pendingScanIconData = nil
+            pendingScanBusinessCardImageData = nil
         }
     }
 
@@ -179,6 +205,9 @@ final class QRExchangeViewModel: ObservableObject {
         scannedProfile = nil
         scannedSessionId = nil
         pendingScanIsDuplicate = false
+        pendingScanCosplayCharacterName = nil
+        pendingScanIconData = nil
+        pendingScanBusinessCardImageData = nil
     }
 
     private func isBlocked(_ peer: LightweightProfile) async throws -> Bool {

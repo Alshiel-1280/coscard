@@ -46,9 +46,14 @@ final class PeerRepository: PeerRepositoryProtocol {
         }
         return PeerDetail(
             summary: mapSummary(e),
+            latestCosplayCharacterName: e.latestCosplayCharacterName,
             latestSNSLabel: e.latestSNSLabel,
             latestSNSURL: e.latestSNSURL,
+            latestTwitterURL: e.latestTwitterURL,
+            latestInstagramURL: e.latestInstagramURL,
+            latestTiktokURL: e.latestTiktokURL,
             latestIconThumbnailData: e.latestIconThumbnailData,
+            latestBusinessCardImageData: e.latestBusinessCardImageData,
             firstMetAt: e.firstMetAt,
             lastMetAt: e.lastMetAt,
             lastEventTag: e.lastEventTag,
@@ -127,6 +132,9 @@ final class PeerRepository: PeerRepositoryProtocol {
         let now = Date()
         let publicProfileId = Self.normalizedPublicProfileId(received.publicProfileId)
         let existing = try fetchEntity(localPeerKey: localPeerKey, publicProfileId: publicProfileId)
+        let twitterURL = Self.socialURL(from: received, service: .x)
+        let instagramURL = Self.socialURL(from: received, service: .instagram)
+        let tiktokURL = Self.socialURL(from: received, service: .tiktok)
         let peerId: UUID
         if let e = existing {
             e.localPeerKey = localPeerKey
@@ -134,10 +142,15 @@ final class PeerRepository: PeerRepositoryProtocol {
                 e.publicProfileId = publicProfileId
             }
             e.latestDisplayName = received.displayName
+            e.latestCosplayCharacterName = received.cosplayCharacterName
             e.latestBio = received.bioShort
             e.latestSNSLabel = received.primarySNSLabel
             e.latestSNSURL = received.primarySNSURL
+            e.latestTwitterURL = twitterURL
+            e.latestInstagramURL = instagramURL
+            e.latestTiktokURL = tiktokURL
             e.latestIconThumbnailData = received.iconThumbnailData
+            e.latestBusinessCardImageData = received.businessCardImageData
             e.lastMetAt = now
             e.lastReceivedProfileVersion = received.profileVersion
             if let memo { e.memo = memo }
@@ -149,10 +162,15 @@ final class PeerRepository: PeerRepositoryProtocol {
                 localPeerKey: localPeerKey,
                 publicProfileId: publicProfileId,
                 latestDisplayName: received.displayName,
+                latestCosplayCharacterName: received.cosplayCharacterName,
                 latestBio: received.bioShort,
                 latestSNSLabel: received.primarySNSLabel,
                 latestSNSURL: received.primarySNSURL,
+                latestTwitterURL: twitterURL,
+                latestInstagramURL: instagramURL,
+                latestTiktokURL: tiktokURL,
                 latestIconThumbnailData: received.iconThumbnailData,
+                latestBusinessCardImageData: received.businessCardImageData,
                 firstMetAt: now,
                 lastMetAt: now,
                 lastEventTag: eventTag,
@@ -166,10 +184,15 @@ final class PeerRepository: PeerRepositoryProtocol {
             ownerType: "peer",
             ownerReferenceId: peerId,
             displayName: received.displayName,
+            cosplayCharacterName: received.cosplayCharacterName,
             bio: received.bioShort,
             primarySNSLabel: received.primarySNSLabel,
             primarySNSURL: received.primarySNSURL,
+            twitterURL: twitterURL,
+            instagramURL: instagramURL,
+            tiktokURL: tiktokURL,
             iconThumbnailData: received.iconThumbnailData,
+            businessCardImageData: received.businessCardImageData,
             profileVersion: received.profileVersion
         )
         modelContext.insert(snap)
@@ -206,6 +229,30 @@ final class PeerRepository: PeerRepositoryProtocol {
         let trimmed = value?.trimmedCoscard() ?? ""
         guard !trimmed.isEmpty else { return nil }
         return trimmed.lowercased()
+    }
+
+    private static func socialURL(from profile: LightweightProfile, service: SNSUserID.Service) -> String? {
+        let explicitValue: String?
+        switch service {
+        case .x:
+            explicitValue = profile.twitterURL
+        case .instagram:
+            explicitValue = profile.instagramURL
+        case .tiktok:
+            explicitValue = profile.tiktokURL
+        }
+        if let value = normalizedSocialValue(explicitValue) {
+            return value
+        }
+        guard SNSUserID.service(label: profile.primarySNSLabel, rawValue: profile.primarySNSURL) == service else {
+            return nil
+        }
+        return normalizedSocialValue(profile.primarySNSURL)
+    }
+
+    private static func normalizedSocialValue(_ value: String?) -> String? {
+        let trimmed = value?.trimmedCoscard() ?? ""
+        return trimmed.isEmpty ? nil : trimmed
     }
 
     private func mapSummary(_ e: PeerContactEntity) -> PeerSummary {

@@ -2,7 +2,6 @@ import Foundation
 
 @MainActor
 final class OnboardingViewModel: ObservableObject {
-    @Published var displayName = ""
     @Published var errorMessage: String?
 
     private var env: AppEnvironment?
@@ -12,7 +11,7 @@ final class OnboardingViewModel: ObservableObject {
     }
 
     @discardableResult
-    func save() async -> Bool {
+    func save(displayName: String) async -> Bool {
         errorMessage = nil
         let draft = ProfileDraft(
             displayName: displayName.trimmedCoscard(),

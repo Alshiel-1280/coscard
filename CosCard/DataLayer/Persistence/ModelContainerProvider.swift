@@ -5,6 +5,7 @@ enum ModelContainerProvider {
     static func makeContainer() throws -> ModelContainer {
         let schema = Schema([
             UserProfileEntity.self,
+            BusinessCardHistoryEntity.self,
             PeerContactEntity.self,
             ExchangeSessionEntity.self,
             LightweightProfileSnapshotEntity.self,
@@ -23,6 +24,7 @@ enum ModelContainerProvider {
     static func makePreviewContainer() throws -> ModelContainer {
         let schema = Schema([
             UserProfileEntity.self,
+            BusinessCardHistoryEntity.self,
             PeerContactEntity.self,
             ExchangeSessionEntity.self,
             LightweightProfileSnapshotEntity.self,

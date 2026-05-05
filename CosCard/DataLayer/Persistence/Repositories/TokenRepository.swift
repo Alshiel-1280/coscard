@@ -110,7 +110,7 @@ final class TokenRepository: TokenRepositoryProtocol {
 
     func pruneExpired() async throws {
         let now = Date()
-        var descriptor = FetchDescriptor<ExchangeTokenEntity>(
+        let descriptor = FetchDescriptor<ExchangeTokenEntity>(
             predicate: #Predicate { $0.expiresAt < now }
         )
         let expired = try modelContext.fetch(descriptor)

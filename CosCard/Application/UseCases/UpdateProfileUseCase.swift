@@ -2,6 +2,7 @@ import Foundation
 
 enum ProfileEditValidationError: LocalizedError {
     case invalidDisplayName
+    case invalidCosplayCharacterName
     case invalidXUserID
     case invalidInstagramUserID
     case invalidTikTokUserID
@@ -10,6 +11,8 @@ enum ProfileEditValidationError: LocalizedError {
         switch self {
         case .invalidDisplayName:
             return "表示名は1〜24文字で入力してください"
+        case .invalidCosplayCharacterName:
+            return "キャラ名は40文字以内で入力してください"
         case .invalidXUserID:
             return "XのユーザーIDは50文字以内・空白なしで入力してください"
         case .invalidInstagramUserID:
@@ -27,6 +30,9 @@ struct UpdateProfileUseCase {
     func execute(_ draft: ProfileDraft) async throws -> ProfileSummary {
         guard ProfileValidation.validateDisplayName(draft.displayName) else {
             throw ProfileEditValidationError.invalidDisplayName
+        }
+        guard ProfileValidation.validateCosplayCharacterName(draft.cosplayCharacterName) else {
+            throw ProfileEditValidationError.invalidCosplayCharacterName
         }
         guard ProfileValidation.validateSNSUserID(draft.twitterURL) else {
             throw ProfileEditValidationError.invalidXUserID

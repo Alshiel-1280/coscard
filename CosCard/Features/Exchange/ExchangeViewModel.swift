@@ -428,11 +428,16 @@ final class ExchangeViewModel: ObservableObject {
                             ephemeralToken: p.ephemeralToken,
                             publicProfileId: p.publicProfileId,
                             displayName: p.displayName,
+                            cosplayCharacterName: p.cosplayCharacterName,
                             bioShort: p.bioShort,
                             primarySNSLabel: p.primarySNSLabel,
                             primarySNSURL: p.primarySNSURL,
+                            twitterURL: p.twitterURL,
+                            instagramURL: p.instagramURL,
+                            tiktokURL: p.tiktokURL,
                             profileVersion: p.profileVersion,
-                            iconThumbnailData: p.iconThumbnailData
+                            iconThumbnailData: p.iconThumbnailData,
+                            businessCardImageData: p.businessCardImageData
                         )
                         let duplicateCheck = try await ResolveDuplicateExchangeUseCase().check(
                             peerProfile: peerProfile,
@@ -502,11 +507,16 @@ final class ExchangeViewModel: ObservableObject {
                 ephemeralToken: token,
                 publicProfileId: publicId,
                 displayName: profile.displayName,
+                cosplayCharacterName: profile.cosplayCharacterName,
                 bioShort: nil,
                 primarySNSLabel: profile.primarySNSLabel,
                 primarySNSURL: profile.primarySNSURL,
+                twitterURL: profile.twitterURL,
+                instagramURL: profile.instagramURL,
+                tiktokURL: profile.tiktokURL,
                 profileVersion: profile.profileVersion,
-                iconThumbnailData: thumb
+                iconThumbnailData: thumb,
+                businessCardImageData: profile.businessCardImageData
             )
             try await env.nearby.sendLightweightProfile(light, exchangeId: exchangeId)
             try await env.tokenRepository.consumeOutgoingTokenForSession(exchangeId)

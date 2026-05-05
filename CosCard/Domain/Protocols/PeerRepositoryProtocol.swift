@@ -24,9 +24,14 @@ struct PeerExchangeSessionRow: Identifiable, Equatable, Sendable {
 
 struct PeerDetail: Equatable, Sendable {
     var summary: PeerSummary
+    var latestCosplayCharacterName: String?
     var latestSNSLabel: String?
     var latestSNSURL: String?
+    var latestTwitterURL: String?
+    var latestInstagramURL: String?
+    var latestTiktokURL: String?
     var latestIconThumbnailData: Data?
+    var latestBusinessCardImageData: Data?
     var firstMetAt: Date
     var lastMetAt: Date
     var lastEventTag: String?

@@ -17,22 +17,10 @@ struct ExchangeModeView: View {
                     .accessibilityLabel("交換の状態、\(vm.exchangeState.localizedLabel)")
             }
             if let code = vm.confirmationCode {
-                Section("確認コード（双方で一致を確認）") {
-                    Text(code)
-                        .font(.system(size: 36, weight: .bold, design: .monospaced))
-                        .frame(maxWidth: .infinity)
-                        .accessibilityLabel("確認コード、\(code.map(String.init).joined(separator: " "))")
-                    Text("目視で同じ4桁であることを確認してから承認してください。")
-                        .font(.caption)
-                        .foregroundStyle(.secondary)
-                    if !vm.localUserApproved {
-                        Button("確認して承認する") {
-                            Task { await vm.userConfirmAndApprove() }
-                        }
-                    } else if !vm.peerHasApproved {
-                        Text("相手の承認を待っています…")
-                            .foregroundStyle(.secondary)
-                    }
+                Section {
+                    codeApprovalView(code)
+                } header: {
+                    Text("確認コード")
                 }
             }
             if vm.hasSentMyProfile, vm.receivedPeerProfile == nil {
@@ -102,6 +90,9 @@ struct ExchangeModeView: View {
             NavigationStack {
                 ExchangeCompleteView(
                     peerName: vm.receivedPeerProfile?.displayName ?? "相手",
+                    peerCosplayCharacterName: vm.receivedPeerProfile?.cosplayCharacterName,
+                    peerIconData: vm.receivedPeerProfile?.iconThumbnailData,
+                    peerBusinessCardImageData: vm.receivedPeerProfile?.businessCardImageData,
                     isDuplicateExchange: vm.receivedPeerIsDuplicate
                 ) { memo, tag, duplicateChoice in
                     Task {
@@ -124,6 +115,50 @@ struct ExchangeModeView: View {
         }
         .onReceive(NotificationCenter.default.publisher(for: .coscardPeerBlockListDidChange)) { _ in
             Task { await vm.refreshInviteBlockListAsync() }
+        }
+    }
+
+    @ViewBuilder
+    private func codeApprovalView(_ code: String) -> some View {
+        VStack(spacing: AppSpacing.md) {
+            Text(code)
+                .font(.system(size: 46, weight: .bold, design: .monospaced))
+                .frame(maxWidth: .infinity)
+                .padding(.vertical, AppSpacing.md)
+                .background(AppColors.card)
+                .clipShape(RoundedRectangle(cornerRadius: 18, style: .continuous))
+                .accessibilityLabel("確認コード、\(code.map(String.init).joined(separator: " "))")
+
+            Label("相手の画面と同じ4桁なら承認", systemImage: "number.square.fill")
+                .font(.caption.weight(.semibold))
+                .foregroundStyle(.secondary)
+
+            approvalAction
+        }
+        .padding(.vertical, AppSpacing.xs)
+    }
+
+    @ViewBuilder
+    private var approvalAction: some View {
+        if !vm.localUserApproved {
+            Button {
+                Task { await vm.userConfirmAndApprove() }
+            } label: {
+                Label("確認して承認する", systemImage: "checkmark.shield.fill")
+                    .frame(maxWidth: .infinity)
+            }
+            .buttonStyle(.borderedProminent)
+            .controlSize(.large)
+        } else if !vm.peerHasApproved {
+            Label("相手の承認を待っています…", systemImage: "clock")
+                .font(.subheadline)
+                .foregroundStyle(.secondary)
+                .frame(maxWidth: .infinity, alignment: .leading)
+        } else {
+            Label("双方承認済み", systemImage: "checkmark.circle.fill")
+                .font(.subheadline.weight(.semibold))
+                .foregroundStyle(Color.green)
+                .frame(maxWidth: .infinity, alignment: .leading)
         }
     }
 }

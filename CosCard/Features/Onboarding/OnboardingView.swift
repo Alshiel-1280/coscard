@@ -3,6 +3,7 @@ import SwiftUI
 struct OnboardingView: View {
     @EnvironmentObject private var env: AppEnvironment
     @StateObject private var vm = OnboardingViewModel()
+    @State private var displayName = ""
     var onComplete: () -> Void
 
     var body: some View {
@@ -25,15 +26,15 @@ struct OnboardingView: View {
             }
             .listRowBackground(Color.clear)
             Section {
-                TextField("コスネーム（1〜24文字）", text: $vm.displayName)
-                    .onChange(of: vm.displayName) { _, new in
-                        if new.count > ProfileValidation.displayNameRange.upperBound {
-                            vm.displayName = String(new.prefix(ProfileValidation.displayNameRange.upperBound))
-                        }
-                    }
+                TextField("コスネーム（1〜24文字）", text: $displayName)
             } footer: {
-                Text("\(vm.displayName.count)/\(ProfileValidation.displayNameRange.upperBound)")
+                Text("\(displayName.count)/\(ProfileValidation.displayNameRange.upperBound)")
                     .font(.caption2)
+                    .foregroundStyle(
+                        displayName.count > ProfileValidation.displayNameRange.upperBound
+                            ? AppColors.danger
+                            : Color.secondary
+                    )
             }
             if let err = vm.errorMessage {
                 Section {
@@ -43,14 +44,14 @@ struct OnboardingView: View {
             Section {
                 Button {
                     Task {
-                        if await vm.save() { onComplete() }
+                        if await vm.save(displayName: displayName) { onComplete() }
                     }
                 } label: {
                     Text("はじめる")
                         .frame(maxWidth: .infinity)
                         .font(.headline)
                 }
-                .disabled(vm.displayName.trimmedCoscard().isEmpty)
+                .disabled(!ProfileValidation.validateDisplayName(displayName))
             }
         }
         .navigationTitle("ようこそ")
