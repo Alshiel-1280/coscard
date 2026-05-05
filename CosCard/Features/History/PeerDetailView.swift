@@ -65,6 +65,23 @@ struct PeerDetailView: View {
                                 }
                             }
                         }
+                        let importedLinks = importedContactLinks(
+                            from: vm.contactLinks,
+                            excluding: Set(socialLinks.map { $0.url.absoluteString.lowercased() })
+                        )
+                        if !importedLinks.isEmpty {
+                            ForEach(importedLinks) { link in
+                                LabeledContent(link.label) {
+                                    Link(destination: link.url) {
+                                        HStack(spacing: 4) {
+                                            Text(link.displayValue)
+                                            Image(systemName: "arrow.up.forward.app")
+                                                .imageScale(.small)
+                                        }
+                                    }
+                                }
+                            }
+                        }
                     }
                     Section("交換日・タグ") {
                         LabeledContent("初回の交換") {
@@ -176,6 +193,13 @@ struct PeerDetailView: View {
         var url: URL
     }
 
+    private struct ImportedContactLink: Identifiable {
+        var id: UUID
+        var label: String
+        var displayValue: String
+        var url: URL
+    }
+
     private func socialProfileLinks(from detail: PeerDetail) -> [SocialProfileLink] {
         var links: [SocialProfileLink] = []
         let serviceValues: [(SNSUserID.Service, String?)] = [
@@ -220,6 +244,29 @@ struct PeerDetailView: View {
         }
         let id = service.map { SNSUserID.displayName(for: $0) } ?? "\(resolvedLabel)-\(url.absoluteString)"
         return SocialProfileLink(id: id, service: service, label: resolvedLabel, displayValue: displayValue, url: url)
+    }
+
+    private func importedContactLinks(
+        from links: [ContactLinkSummary],
+        excluding existingURLKeys: Set<String>
+    ) -> [ImportedContactLink] {
+        var seen = existingURLKeys
+        var result: [ImportedContactLink] = []
+        for link in links {
+            guard let rawURL = link.normalizedURL,
+                  let url = URL(string: rawURL)
+            else { continue }
+            let key = url.absoluteString.lowercased()
+            guard !seen.contains(key) else { continue }
+            seen.insert(key)
+            result.append(ImportedContactLink(
+                id: link.id,
+                label: link.platform.displayName,
+                displayValue: link.usernameCandidate ?? rawURL,
+                url: url
+            ))
+        }
+        return result
     }
 
     private func normalized(_ value: String?) -> String? {

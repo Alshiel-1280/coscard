@@ -6,6 +6,7 @@ final class AppEnvironment: ObservableObject {
     let modelContext: ModelContext
     let profileRepository: ProfileRepositoryProtocol
     let peerRepository: PeerRepositoryProtocol
+    let businessCardRepository: BusinessCardRepositoryProtocol
     let exchangeSessionRepository: ExchangeSessionRepositoryProtocol
     let tokenRepository: TokenRepositoryProtocol
     let nearby: NearbyServiceProtocol
@@ -14,6 +15,7 @@ final class AppEnvironment: ObservableObject {
         self.modelContext = modelContext
         profileRepository = ProfileRepository(modelContext: modelContext)
         peerRepository = PeerRepository(modelContext: modelContext)
+        businessCardRepository = BusinessCardRepository(modelContext: modelContext)
         exchangeSessionRepository = ExchangeSessionRepository(modelContext: modelContext)
         tokenRepository = TokenRepository(modelContext: modelContext)
         nearby = MPCManager()

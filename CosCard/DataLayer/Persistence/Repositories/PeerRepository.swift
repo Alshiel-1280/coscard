@@ -200,6 +200,94 @@ final class PeerRepository: PeerRepositoryProtocol {
         return peerId
     }
 
+    func upsertPeerFromBusinessCard(
+        draft: BusinessCardImportDraft,
+        mergePeerId: UUID?
+    ) async throws -> UUID {
+        let now = Date()
+        let displayName = draft.displayName.trimmedCoscard()
+        let localPeerKey = Self.businessCardLocalPeerKey(
+            displayName: displayName,
+            links: draft.links,
+            imageData: draft.imageData
+        )
+        let twitterURL = Self.linkValue(from: draft.links, platform: .x)
+        let instagramURL = Self.linkValue(from: draft.links, platform: .instagram)
+        let tiktokURL = Self.linkValue(from: draft.links, platform: .tiktok)
+        let primaryLink = Self.primaryLink(from: draft.links)
+        let mergeEntity: PeerContactEntity?
+        if let mergePeerId {
+            mergeEntity = try fetchEntity(id: mergePeerId)
+        } else {
+            mergeEntity = nil
+        }
+        let entity: PeerContactEntity?
+        if let mergeEntity {
+            entity = mergeEntity
+        } else {
+            entity = try fetchEntity(localPeerKey: localPeerKey, publicProfileId: nil)
+        }
+
+        let peerId: UUID
+        if let e = entity {
+            if e.publicProfileId == nil {
+                e.localPeerKey = localPeerKey
+            }
+            e.latestDisplayName = displayName
+            e.latestCosplayCharacterName = draft.cosplayCharacterName
+            e.latestSNSLabel = primaryLink?.platform.displayName
+            e.latestSNSURL = Self.storedValue(from: primaryLink)
+            e.latestTwitterURL = twitterURL ?? e.latestTwitterURL
+            e.latestInstagramURL = instagramURL ?? e.latestInstagramURL
+            e.latestTiktokURL = tiktokURL ?? e.latestTiktokURL
+            e.latestBusinessCardImageData = draft.imageData
+            e.lastMetAt = now
+            if let memo = draft.memo { e.memo = memo }
+            if let eventTag = draft.eventTag { e.lastEventTag = eventTag }
+            e.updatedAt = now
+            peerId = e.id
+        } else {
+            let e = PeerContactEntity(
+                localPeerKey: localPeerKey,
+                latestDisplayName: displayName,
+                latestCosplayCharacterName: draft.cosplayCharacterName,
+                latestSNSLabel: primaryLink?.platform.displayName,
+                latestSNSURL: Self.storedValue(from: primaryLink),
+                latestTwitterURL: twitterURL,
+                latestInstagramURL: instagramURL,
+                latestTiktokURL: tiktokURL,
+                latestBusinessCardImageData: draft.imageData,
+                firstMetAt: draft.capturedAt,
+                lastMetAt: now,
+                lastEventTag: draft.eventTag,
+                memo: draft.memo,
+                createdAt: now,
+                updatedAt: now
+            )
+            modelContext.insert(e)
+            peerId = e.id
+        }
+
+        modelContext.insert(LightweightProfileSnapshotEntity(
+            ownerType: "business_card",
+            ownerReferenceId: peerId,
+            displayName: displayName,
+            cosplayCharacterName: draft.cosplayCharacterName,
+            bio: nil,
+            primarySNSLabel: primaryLink?.platform.displayName,
+            primarySNSURL: Self.storedValue(from: primaryLink),
+            twitterURL: twitterURL,
+            instagramURL: instagramURL,
+            tiktokURL: tiktokURL,
+            iconThumbnailData: nil,
+            businessCardImageData: draft.imageData,
+            profileVersion: 1
+        ))
+
+        try modelContext.save()
+        return peerId
+    }
+
     private func fetchEntity(id: UUID) throws -> PeerContactEntity? {
         var descriptor = FetchDescriptor<PeerContactEntity>(
             predicate: #Predicate { $0.id == id }
@@ -252,6 +340,48 @@ final class PeerRepository: PeerRepositoryProtocol {
 
     private static func normalizedSocialValue(_ value: String?) -> String? {
         let trimmed = value?.trimmedCoscard() ?? ""
+        return trimmed.isEmpty ? nil : trimmed
+    }
+
+    private static func businessCardLocalPeerKey(
+        displayName: String,
+        links: [ContactLinkDraft],
+        imageData: Data
+    ) -> String {
+        let strongestIdentity = links
+            .compactMap { $0.normalizedURL?.lowercased() ?? $0.usernameCandidate?.lowercased() }
+            .first
+        let fallbackImageHash = String(Checksum.sha256Hex(of: imageData).prefix(16))
+        let parts = [
+            "business-card",
+            displayName.normalizedForPeerKey(),
+            strongestIdentity ?? fallbackImageHash,
+        ]
+        return String(Checksum.sha256Hex(of: parts.joined(separator: "|")).prefix(40))
+    }
+
+    private static func linkValue(from links: [ContactLinkDraft], platform: ContactLinkPlatform) -> String? {
+        guard let link = links.first(where: { $0.platform == platform }) else { return nil }
+        return storedValue(from: link)
+    }
+
+    private static func primaryLink(from links: [ContactLinkDraft]) -> ContactLinkDraft? {
+        links.first { link in
+            switch link.platform {
+            case .x, .instagram, .tiktok:
+                return true
+            case .litlink, .linktree, .website:
+                return true
+            case .email, .phone, .other:
+                return false
+            }
+        }
+    }
+
+    private static func storedValue(from link: ContactLinkDraft?) -> String? {
+        guard let link else { return nil }
+        let value = link.usernameCandidate ?? link.normalizedURL ?? link.originalValue
+        let trimmed = value.trimmedCoscard()
         return trimmed.isEmpty ? nil : trimmed
     }
 

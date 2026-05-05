@@ -6,6 +6,9 @@ enum ModelContainerProvider {
         let schema = Schema([
             UserProfileEntity.self,
             BusinessCardHistoryEntity.self,
+            BusinessCardCaptureEntity.self,
+            ContactLinkEntity.self,
+            ExtractionResultEntity.self,
             PeerContactEntity.self,
             ExchangeSessionEntity.self,
             LightweightProfileSnapshotEntity.self,
@@ -25,6 +28,9 @@ enum ModelContainerProvider {
         let schema = Schema([
             UserProfileEntity.self,
             BusinessCardHistoryEntity.self,
+            BusinessCardCaptureEntity.self,
+            ContactLinkEntity.self,
+            ExtractionResultEntity.self,
             PeerContactEntity.self,
             ExchangeSessionEntity.self,
             LightweightProfileSnapshotEntity.self,

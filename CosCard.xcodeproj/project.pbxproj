@@ -10,6 +10,7 @@
 		0261940FA817D239F0779DC6 /* ExchangeCandidateRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = ADE453BA852E0BE35A44BB72 /* ExchangeCandidateRow.swift */; };
 		045CE5DB8C1A63EF0F926149 /* NearbyServiceProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BD53AB497769802F8F07CD3 /* NearbyServiceProtocol.swift */; };
 		0694869D7D27BA08082590CB /* MainTabView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB9033BF2ECD57A5D273EA60 /* MainTabView.swift */; };
+		0A28C7BEA2C7E8147A2BC721 /* ContactLinkNormalizer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1027989A3F1CC4BBD77CC6F5 /* ContactLinkNormalizer.swift */; };
 		0D32C03AB0B8DD8D12FE248C /* ProfileRepository.swift in Sources */ = {isa = PBXBuildFile; fileRef = F323DAC9CBB20DEA6B67280A /* ProfileRepository.swift */; };
 		0F219D85A662791B3BE38820 /* BlockListViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = CBB7F883E68005449F440C38 /* BlockListViewModel.swift */; };
 		10229B0A9B6EDBD47D3F94F1 /* ExchangeProgressView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9C25A80ACAE944A61FCBAC1D /* ExchangeProgressView.swift */; };
@@ -20,6 +21,7 @@
 		157A0D6C81B50AC9161DB95A /* ImageResizer.swift in Sources */ = {isa = PBXBuildFile; fileRef = E85DF252ACB68AE543FB81FE /* ImageResizer.swift */; };
 		15E56219723EE7EEAF776B4D /* QRScannerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6A956EE8875299C40A759346 /* QRScannerView.swift */; };
 		169054682FE1EFFC7CF3D5B4 /* TokenRepositoryTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 46F1CF5D279F6B7BAAC75F4A /* TokenRepositoryTests.swift */; };
+		173299C7633639BA20D76B1C /* BusinessCardImportModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = A726A7F6DD1333C03E871C6C /* BusinessCardImportModels.swift */; };
 		184EC915DD3BAF34ACAD5C93 /* ProfileRepositoryTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E75EF3C1A9E35E8FCA5CAD08 /* ProfileRepositoryTests.swift */; };
 		18516E773AD9A04D094343F5 /* Logger.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4D8D4E0B4AF1D1E71162108A /* Logger.swift */; };
 		1B4BCFB6928F2508808BE023 /* LightweightProfileSnapshotEntity.swift in Sources */ = {isa = PBXBuildFile; fileRef = 574F1C451E5B5E2FA521C5D1 /* LightweightProfileSnapshotEntity.swift */; };
@@ -34,23 +36,28 @@
 		2D736D7CC1A3F34F31D87B93 /* IncomingInviteView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 234F88876CC6A81F31E463BA /* IncomingInviteView.swift */; };
 		2DF3928195900EE95A2AFBD4 /* PeerCandidate.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA8403766D9F8F7DB40B4769 /* PeerCandidate.swift */; };
 		30BC91E6B7428F8F7594B01B /* StopExchangeUseCase.swift in Sources */ = {isa = PBXBuildFile; fileRef = 49351BAEF75DFAB1B1C40AA2 /* StopExchangeUseCase.swift */; };
+		31B8336BAD8A29B48E9825D3 /* BusinessCardCameraPicker.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84BEC8D8DF2E3BF9F9686204 /* BusinessCardCameraPicker.swift */; };
 		348A28FE681762DFAE8E0199 /* PeerRepositoryProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = EEAAECFEFD26B0971CDB89EC /* PeerRepositoryProtocol.swift */; };
 		3752CE93253DEE4152BDCF77 /* BlockListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CB2FF5AA49B273BA45384258 /* BlockListView.swift */; };
 		396F44D9E83FC822B2B07B6F /* String+Validation.swift in Sources */ = {isa = PBXBuildFile; fileRef = E129D54563B0D83CA7856BC9 /* String+Validation.swift */; };
 		39C2C664355EBC66F29E4E64 /* PeerDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CD580ED17971FF588371664D /* PeerDetailView.swift */; };
 		414DA4C5105C4945A2A8D55C /* MPCManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7E167C7BA9D81C626B78C80 /* MPCManager.swift */; };
 		419EFFACDC23ABF6404169EB /* AppSpacing.swift in Sources */ = {isa = PBXBuildFile; fileRef = 703910C1A8C83A6D9CB5C239 /* AppSpacing.swift */; };
+		44E54151D9DE73E3E3AF1FA2 /* BusinessCardImportView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3BC2E017AF0E9C62A7D8B3D6 /* BusinessCardImportView.swift */; };
 		4969BF8A2F2010CF62A718D8 /* SaveExchangeResultUseCaseTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 330466158226A6F42026D118 /* SaveExchangeResultUseCaseTests.swift */; };
+		4A73E719A62DCFAB71D36C9B /* BusinessCardCaptureEntity.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1AF25D13FA1A7CEDB81E6B2B /* BusinessCardCaptureEntity.swift */; };
 		4D3F617635BDC3F6A75F99D2 /* OnboardingViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = FCEE8111E78C448B2E301D41 /* OnboardingViewModel.swift */; };
 		4D959FF7C2922A8644BB39DE /* BusinessCardHistoryEntity.swift in Sources */ = {isa = PBXBuildFile; fileRef = CC5FEE73801FA2DEC62460A1 /* BusinessCardHistoryEntity.swift */; };
 		4E8358D013E7DC2C8B31D509 /* HistoryListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8B9271024118379587318A65 /* HistoryListView.swift */; };
 		4FB80777485651FF14AD8B1A /* RootView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F4F1BABA990F92FF76ABE15C /* RootView.swift */; };
 		5089808FBFE8787D30DEE2A8 /* ModelContainerProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = F6E15F3746A013EF6D7BF492 /* ModelContainerProvider.swift */; };
+		53B14D01ABB961A67750D8F5 /* ContactLinkEntity.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3E79B22585075C458ECED9B8 /* ContactLinkEntity.swift */; };
 		57431ACF0AD1C360303E5C1F /* EventTagEntity.swift in Sources */ = {isa = PBXBuildFile; fileRef = 556FF66C9B3F1F98AB856C48 /* EventTagEntity.swift */; };
 		5B844EFF11421B547C53FBFF /* AcceptInviteUseCase.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8F542991E544613490E49EA3 /* AcceptInviteUseCase.swift */; };
 		608345C48AD631B1224924A5 /* SendInviteUseCase.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3F125810ED534839EF6E6A12 /* SendInviteUseCase.swift */; };
 		61E3A72BE46399AC5CC5CBD4 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = E2F65A085297C35E987B74BB /* Assets.xcassets */; };
 		62D4A06FC3D2730E2416E80A /* AppColors.swift in Sources */ = {isa = PBXBuildFile; fileRef = B652CD5254F389D29DFA1F8D /* AppColors.swift */; };
+		6337C8BF92F75F37EF932425 /* BusinessCardRepositoryProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0FC64EFC6E49AF4A600446D7 /* BusinessCardRepositoryProtocol.swift */; };
 		67A911FF7F87462BE09F0EB8 /* LightweightProfile.swift in Sources */ = {isa = PBXBuildFile; fileRef = 018E8FE6619604F0D8A028DC /* LightweightProfile.swift */; };
 		68095823BE124C4E891E5C32 /* LaunchView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48F1C808BE01D5DBEE8732BF /* LaunchView.swift */; };
 		6D1596CB8F551FE98CD5629F /* MPCMessageEncoder.swift in Sources */ = {isa = PBXBuildFile; fileRef = C3E57D57F0A531D4A3B7763A /* MPCMessageEncoder.swift */; };
@@ -61,11 +68,14 @@
 		7A901D848A94F9B4FF39837B /* PeerDetailViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = E0D2C58CDF2DEB605B322F41 /* PeerDetailViewModel.swift */; };
 		80826620D658D37958480E78 /* ExchangeViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 990A555C6DA005AFF60D6978 /* ExchangeViewModel.swift */; };
 		80E6AB0D8CD5E88A6828013E /* UpdateProfileUseCase.swift in Sources */ = {isa = PBXBuildFile; fileRef = 94B1C1120ED24347EDE78D17 /* UpdateProfileUseCase.swift */; };
+		838E5FDFF8552CD3907C3643 /* SaveBusinessCardImportUseCase.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4FDDC3C61F932A73E6C06F02 /* SaveBusinessCardImportUseCase.swift */; };
 		8490D81C76A63FAB870A6DE2 /* SaveExchangeResultUseCase.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1EEE82029F0C9B636E1D1428 /* SaveExchangeResultUseCase.swift */; };
 		8ACC03F015CAD517320B78AB /* PeerContactEntity.swift in Sources */ = {isa = PBXBuildFile; fileRef = D09F8D47BC157F0E7AF8FD87 /* PeerContactEntity.swift */; };
 		8DC5FA9EDA0230C843DBAFB0 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC0EF0B48DFCD1F266B1AAE9 /* SettingsView.swift */; };
 		9117800EA1995F01087DEBC9 /* LocalPeerKeyTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 206F2F43182FD6E5E2A199E5 /* LocalPeerKeyTests.swift */; };
+		A0F8C757DE89293B1C993D48 /* BusinessCardImportTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 800BC7EE06703372AC01B897 /* BusinessCardImportTests.swift */; };
 		A1C641F1DA3304038A9FEA84 /* TokenRepository.swift in Sources */ = {isa = PBXBuildFile; fileRef = 78005C41E1A144F0729FA91A /* TokenRepository.swift */; };
+		A48B3E3934D303ED032CBD19 /* ExtractionResultEntity.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6C5019BB4924D019C27088F4 /* ExtractionResultEntity.swift */; };
 		A8797E1CB564D05CB55A7665 /* ExchangeSessionEntity.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4EE6A3FCC42D68DCF422E677 /* ExchangeSessionEntity.swift */; };
 		ACAF14066DD349470D22EE05 /* Checksum.swift in Sources */ = {isa = PBXBuildFile; fileRef = F47745DECA4C1668A4498886 /* Checksum.swift */; };
 		AF74139F8FC9F3BF4A14A49B /* ProfileEditView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D52B20E5F11F429DA6A653B4 /* ProfileEditView.swift */; };
@@ -76,6 +86,7 @@
 		BD4850FF5FDD7591B1BE0591 /* LaunchViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = BBDEABF0F33A86AE9946F7CF /* LaunchViewModel.swift */; };
 		BE835A393EB32E19755DA67E /* ExchangeFailureReason.swift in Sources */ = {isa = PBXBuildFile; fileRef = 41B5D4C4BB9B200220864EE7 /* ExchangeFailureReason.swift */; };
 		BEE853687108A0433898DBED /* ExchangeModeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7FE97F030E8B9D526F9F246F /* ExchangeModeView.swift */; };
+		C525F118106E622EC9C39418 /* BusinessCardImageAnalyzer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4E0938ED5AFF660E65635E59 /* BusinessCardImageAnalyzer.swift */; };
 		C834E5A0E93B08CD77B36D28 /* ProfileRepositoryProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB6C5C32A5DF7611940D763A /* ProfileRepositoryProtocol.swift */; };
 		CBA3E6A2C50F9CBD480E406E /* LoadInitialStateUseCase.swift in Sources */ = {isa = PBXBuildFile; fileRef = 469E072171D6AF8343486A08 /* LoadInitialStateUseCase.swift */; };
 		CD6BFFE4D24B91D1FCFEB62F /* LocalPeerKey.swift in Sources */ = {isa = PBXBuildFile; fileRef = 12189C9321C88334341E9E06 /* LocalPeerKey.swift */; };
@@ -95,7 +106,9 @@
 		ED9589CE186D992ACF2C806E /* QRExchangeViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4089F160BB6821A9B257E6C /* QRExchangeViewModel.swift */; };
 		EF310AC9071E49BFA0F94B7A /* ResolveDuplicateExchangeUseCase.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C0FF491C9E42D8649D37789 /* ResolveDuplicateExchangeUseCase.swift */; };
 		F2795F3D5FF87E7BB66C728B /* PeerRepository.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31CDAA006711679913D8617A /* PeerRepository.swift */; };
+		F563236EA3A19940A3B4A793 /* BusinessCardImportViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 46D5E4072E60676301F9161B /* BusinessCardImportViewModel.swift */; };
 		F60A9E74B2A8520C754C06A2 /* CosCardApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9C649CCEBB2C131FD14B620A /* CosCardApp.swift */; };
+		F73EB839C64BCD0E7743D7B2 /* BusinessCardRepository.swift in Sources */ = {isa = PBXBuildFile; fileRef = 43E6EACF321BE7EB2A5A5E19 /* BusinessCardRepository.swift */; };
 		FA1D48F65159D03A94A043EE /* HistoryListViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 44AC312D088C37AF86C99388 /* HistoryListViewModel.swift */; };
 		FB1C79DABFAF1EDD74EE611C /* MultipeerConnectivity.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 56A51409396311FA2977838B /* MultipeerConnectivity.framework */; };
 		FC642ACAD80B5D68516765DD /* MPCMessageEncoderTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 064A440B74B7E218DDE72698 /* MPCMessageEncoderTests.swift */; };
@@ -118,10 +131,13 @@
 		06E2773BE42F3CA383652053 /* StartExchangeUseCase.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StartExchangeUseCase.swift; sourceTree = "<group>"; };
 		079378C4E7AD8983B31C7A49 /* ExchangeCompleteView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExchangeCompleteView.swift; sourceTree = "<group>"; };
 		0C0FF491C9E42D8649D37789 /* ResolveDuplicateExchangeUseCase.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ResolveDuplicateExchangeUseCase.swift; sourceTree = "<group>"; };
+		0FC64EFC6E49AF4A600446D7 /* BusinessCardRepositoryProtocol.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BusinessCardRepositoryProtocol.swift; sourceTree = "<group>"; };
 		0FE98013456D68D89A65264A /* CosCardTests.xctest */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.cfbundle; path = CosCardTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		1027989A3F1CC4BBD77CC6F5 /* ContactLinkNormalizer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContactLinkNormalizer.swift; sourceTree = "<group>"; };
 		104342698CE0A25F21C5E126 /* TermsOfServiceView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TermsOfServiceView.swift; sourceTree = "<group>"; };
 		12189C9321C88334341E9E06 /* LocalPeerKey.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocalPeerKey.swift; sourceTree = "<group>"; };
 		175219A8271B299E672EC5A0 /* ProfileEditViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileEditViewModel.swift; sourceTree = "<group>"; };
+		1AF25D13FA1A7CEDB81E6B2B /* BusinessCardCaptureEntity.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BusinessCardCaptureEntity.swift; sourceTree = "<group>"; };
 		1B05882145CFD6EC59AF5E60 /* ProfileValidationTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileValidationTests.swift; sourceTree = "<group>"; };
 		1DD855D6ABCD94405CD2BAD9 /* AppNotifications.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppNotifications.swift; sourceTree = "<group>"; };
 		1EEE82029F0C9B636E1D1428 /* SaveExchangeResultUseCase.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SaveExchangeResultUseCase.swift; sourceTree = "<group>"; };
@@ -132,18 +148,24 @@
 		31CDAA006711679913D8617A /* PeerRepository.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PeerRepository.swift; sourceTree = "<group>"; };
 		330466158226A6F42026D118 /* SaveExchangeResultUseCaseTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SaveExchangeResultUseCaseTests.swift; sourceTree = "<group>"; };
 		3995C9E43C0841DD503188E0 /* KeychainStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeychainStore.swift; sourceTree = "<group>"; };
+		3BC2E017AF0E9C62A7D8B3D6 /* BusinessCardImportView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BusinessCardImportView.swift; sourceTree = "<group>"; };
+		3E79B22585075C458ECED9B8 /* ContactLinkEntity.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContactLinkEntity.swift; sourceTree = "<group>"; };
 		3F125810ED534839EF6E6A12 /* SendInviteUseCase.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SendInviteUseCase.swift; sourceTree = "<group>"; };
 		41262FDD63E9579C8BC369DD /* UserProfileEntity.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserProfileEntity.swift; sourceTree = "<group>"; };
 		41B5D4C4BB9B200220864EE7 /* ExchangeFailureReason.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExchangeFailureReason.swift; sourceTree = "<group>"; };
+		43E6EACF321BE7EB2A5A5E19 /* BusinessCardRepository.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BusinessCardRepository.swift; sourceTree = "<group>"; };
 		44AC312D088C37AF86C99388 /* HistoryListViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HistoryListViewModel.swift; sourceTree = "<group>"; };
 		469E072171D6AF8343486A08 /* LoadInitialStateUseCase.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoadInitialStateUseCase.swift; sourceTree = "<group>"; };
+		46D5E4072E60676301F9161B /* BusinessCardImportViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BusinessCardImportViewModel.swift; sourceTree = "<group>"; };
 		46F1CF5D279F6B7BAAC75F4A /* TokenRepositoryTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TokenRepositoryTests.swift; sourceTree = "<group>"; };
 		4720176FCB8664CA61483E12 /* MPCPeerHandle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MPCPeerHandle.swift; sourceTree = "<group>"; };
 		48F1C808BE01D5DBEE8732BF /* LaunchView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LaunchView.swift; sourceTree = "<group>"; };
 		49351BAEF75DFAB1B1C40AA2 /* StopExchangeUseCase.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StopExchangeUseCase.swift; sourceTree = "<group>"; };
 		4BD53AB497769802F8F07CD3 /* NearbyServiceProtocol.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NearbyServiceProtocol.swift; sourceTree = "<group>"; };
 		4D8D4E0B4AF1D1E71162108A /* Logger.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Logger.swift; sourceTree = "<group>"; };
+		4E0938ED5AFF660E65635E59 /* BusinessCardImageAnalyzer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BusinessCardImageAnalyzer.swift; sourceTree = "<group>"; };
 		4EE6A3FCC42D68DCF422E677 /* ExchangeSessionEntity.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExchangeSessionEntity.swift; sourceTree = "<group>"; };
+		4FDDC3C61F932A73E6C06F02 /* SaveBusinessCardImportUseCase.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SaveBusinessCardImportUseCase.swift; sourceTree = "<group>"; };
 		54F2105AEC0EB1E53D11EF0E /* PeerRepositoryTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PeerRepositoryTests.swift; sourceTree = "<group>"; };
 		556FF66C9B3F1F98AB856C48 /* EventTagEntity.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EventTagEntity.swift; sourceTree = "<group>"; };
 		55711C6E52B05C22BFBA2979 /* CosCard.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = CosCard.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -152,6 +174,7 @@
 		6221A561F61C3410DAD2BC6A /* Date+Format.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Date+Format.swift"; sourceTree = "<group>"; };
 		6A956EE8875299C40A759346 /* QRScannerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QRScannerView.swift; sourceTree = "<group>"; };
 		6AD555D17C5DE27C5A75A0F2 /* ExchangeSessionRepository.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExchangeSessionRepository.swift; sourceTree = "<group>"; };
+		6C5019BB4924D019C27088F4 /* ExtractionResultEntity.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExtractionResultEntity.swift; sourceTree = "<group>"; };
 		6F7E7B48EBE9F4DA0E4731D0 /* GenerateEphemeralTokenUseCase.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GenerateEphemeralTokenUseCase.swift; sourceTree = "<group>"; };
 		703910C1A8C83A6D9CB5C239 /* AppSpacing.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppSpacing.swift; sourceTree = "<group>"; };
 		7110BB67EB702F4A7CBB60EF /* BusinessCardHistoryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BusinessCardHistoryView.swift; sourceTree = "<group>"; };
@@ -159,7 +182,9 @@
 		755925323B0AA76817C48B01 /* QRCodeGenerator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QRCodeGenerator.swift; sourceTree = "<group>"; };
 		78005C41E1A144F0729FA91A /* TokenRepository.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TokenRepository.swift; sourceTree = "<group>"; };
 		7FE97F030E8B9D526F9F246F /* ExchangeModeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExchangeModeView.swift; sourceTree = "<group>"; };
+		800BC7EE06703372AC01B897 /* BusinessCardImportTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BusinessCardImportTests.swift; sourceTree = "<group>"; };
 		83754140303F32E49643B792 /* RejectInviteUseCase.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RejectInviteUseCase.swift; sourceTree = "<group>"; };
+		84BEC8D8DF2E3BF9F9686204 /* BusinessCardCameraPicker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BusinessCardCameraPicker.swift; sourceTree = "<group>"; };
 		895E12647C0B3E572E700091 /* CreateProfileUseCase.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CreateProfileUseCase.swift; sourceTree = "<group>"; };
 		8B9271024118379587318A65 /* HistoryListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HistoryListView.swift; sourceTree = "<group>"; };
 		8F542991E544613490E49EA3 /* AcceptInviteUseCase.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AcceptInviteUseCase.swift; sourceTree = "<group>"; };
@@ -168,6 +193,7 @@
 		990A555C6DA005AFF60D6978 /* ExchangeViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExchangeViewModel.swift; sourceTree = "<group>"; };
 		9C25A80ACAE944A61FCBAC1D /* ExchangeProgressView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExchangeProgressView.swift; sourceTree = "<group>"; };
 		9C649CCEBB2C131FD14B620A /* CosCardApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CosCardApp.swift; sourceTree = "<group>"; };
+		A726A7F6DD1333C03E871C6C /* BusinessCardImportModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BusinessCardImportModels.swift; sourceTree = "<group>"; };
 		AB9033BF2ECD57A5D273EA60 /* MainTabView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainTabView.swift; sourceTree = "<group>"; };
 		AC0EF0B48DFCD1F266B1AAE9 /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
 		ADE453BA852E0BE35A44BB72 /* ExchangeCandidateRow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExchangeCandidateRow.swift; sourceTree = "<group>"; };
@@ -312,6 +338,7 @@
 		47120DF60D615CDAD05AD24D /* Features */ = {
 			isa = PBXGroup;
 			children = (
+				C203CA58A4CED07AC83B06AF /* BusinessCardImport */,
 				C5596E31C285493C9C55548A /* Exchange */,
 				B4D394BE779D0D7FCF378D48 /* History */,
 				5ABB6B405661F624674AD058 /* Home */,
@@ -342,6 +369,7 @@
 				469E072171D6AF8343486A08 /* LoadInitialStateUseCase.swift */,
 				83754140303F32E49643B792 /* RejectInviteUseCase.swift */,
 				0C0FF491C9E42D8649D37789 /* ResolveDuplicateExchangeUseCase.swift */,
+				4FDDC3C61F932A73E6C06F02 /* SaveBusinessCardImportUseCase.swift */,
 				1EEE82029F0C9B636E1D1428 /* SaveExchangeResultUseCase.swift */,
 				3F125810ED534839EF6E6A12 /* SendInviteUseCase.swift */,
 				06E2773BE42F3CA383652053 /* StartExchangeUseCase.swift */,
@@ -398,6 +426,7 @@
 		86EEA749A37EBCFD31D746F4 /* Models */ = {
 			isa = PBXGroup;
 			children = (
+				A726A7F6DD1333C03E871C6C /* BusinessCardImportModels.swift */,
 				41B5D4C4BB9B200220864EE7 /* ExchangeFailureReason.swift */,
 				1F482CACF78919227CFC6EB0 /* ExchangeState.swift */,
 				018E8FE6619604F0D8A028DC /* LightweightProfile.swift */,
@@ -410,6 +439,7 @@
 		8F1FC60D3612154B590A292E /* CosCardTests */ = {
 			isa = PBXGroup;
 			children = (
+				800BC7EE06703372AC01B897 /* BusinessCardImportTests.swift */,
 				CAE9D0CF977F3E105B3FAF21 /* KeychainStoreTests.swift */,
 				206F2F43182FD6E5E2A199E5 /* LocalPeerKeyTests.swift */,
 				064A440B74B7E218DDE72698 /* MPCMessageEncoderTests.swift */,
@@ -440,8 +470,10 @@
 			isa = PBXGroup;
 			children = (
 				1DD855D6ABCD94405CD2BAD9 /* AppNotifications.swift */,
+				4E0938ED5AFF660E65635E59 /* BusinessCardImageAnalyzer.swift */,
 				F47745DECA4C1668A4498886 /* Checksum.swift */,
 				DF4E167DEB228728FEA48BE9 /* ConfirmationCodeGenerator.swift */,
+				1027989A3F1CC4BBD77CC6F5 /* ContactLinkNormalizer.swift */,
 				E85DF252ACB68AE543FB81FE /* ImageResizer.swift */,
 				12189C9321C88334341E9E06 /* LocalPeerKey.swift */,
 				4D8D4E0B4AF1D1E71162108A /* Logger.swift */,
@@ -481,13 +513,26 @@
 			path = QR;
 			sourceTree = "<group>";
 		};
+		C203CA58A4CED07AC83B06AF /* BusinessCardImport */ = {
+			isa = PBXGroup;
+			children = (
+				84BEC8D8DF2E3BF9F9686204 /* BusinessCardCameraPicker.swift */,
+				3BC2E017AF0E9C62A7D8B3D6 /* BusinessCardImportView.swift */,
+				46D5E4072E60676301F9161B /* BusinessCardImportViewModel.swift */,
+			);
+			path = BusinessCardImport;
+			sourceTree = "<group>";
+		};
 		C5111EB11EF6C72D620D0FB0 /* Entities */ = {
 			isa = PBXGroup;
 			children = (
+				1AF25D13FA1A7CEDB81E6B2B /* BusinessCardCaptureEntity.swift */,
 				CC5FEE73801FA2DEC62460A1 /* BusinessCardHistoryEntity.swift */,
+				3E79B22585075C458ECED9B8 /* ContactLinkEntity.swift */,
 				556FF66C9B3F1F98AB856C48 /* EventTagEntity.swift */,
 				4EE6A3FCC42D68DCF422E677 /* ExchangeSessionEntity.swift */,
 				B6958C96466649E5396E00CD /* ExchangeTokenEntity.swift */,
+				6C5019BB4924D019C27088F4 /* ExtractionResultEntity.swift */,
 				574F1C451E5B5E2FA521C5D1 /* LightweightProfileSnapshotEntity.swift */,
 				D09F8D47BC157F0E7AF8FD87 /* PeerContactEntity.swift */,
 				41262FDD63E9579C8BC369DD /* UserProfileEntity.swift */,
@@ -550,6 +595,7 @@
 		DDCE8227796C1AEAE07368AC /* Protocols */ = {
 			isa = PBXGroup;
 			children = (
+				0FC64EFC6E49AF4A600446D7 /* BusinessCardRepositoryProtocol.swift */,
 				28C8F4241814E4F9C2F2DE8A /* ExchangeSessionRepositoryProtocol.swift */,
 				4BD53AB497769802F8F07CD3 /* NearbyServiceProtocol.swift */,
 				EEAAECFEFD26B0971CDB89EC /* PeerRepositoryProtocol.swift */,
@@ -562,6 +608,7 @@
 		EDD5E82ADA0D44A5448CA351 /* Repositories */ = {
 			isa = PBXGroup;
 			children = (
+				43E6EACF321BE7EB2A5A5E19 /* BusinessCardRepository.swift */,
 				6AD555D17C5DE27C5A75A0F2 /* ExchangeSessionRepository.swift */,
 				31CDAA006711679913D8617A /* PeerRepository.swift */,
 				F323DAC9CBB20DEA6B67280A /* ProfileRepository.swift */,
@@ -660,6 +707,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				A0F8C757DE89293B1C993D48 /* BusinessCardImportTests.swift in Sources */,
 				1CF5A5CE3C76CC69CE1C8E1B /* KeychainStoreTests.swift in Sources */,
 				9117800EA1995F01087DEBC9 /* LocalPeerKeyTests.swift in Sources */,
 				FC642ACAD80B5D68516765DD /* MPCMessageEncoderTests.swift in Sources */,
@@ -682,10 +730,20 @@
 				419EFFACDC23ABF6404169EB /* AppSpacing.swift in Sources */,
 				3752CE93253DEE4152BDCF77 /* BlockListView.swift in Sources */,
 				0F219D85A662791B3BE38820 /* BlockListViewModel.swift in Sources */,
+				31B8336BAD8A29B48E9825D3 /* BusinessCardCameraPicker.swift in Sources */,
+				4A73E719A62DCFAB71D36C9B /* BusinessCardCaptureEntity.swift in Sources */,
 				4D959FF7C2922A8644BB39DE /* BusinessCardHistoryEntity.swift in Sources */,
 				E4B26B10E2E802CDDE83F16F /* BusinessCardHistoryView.swift in Sources */,
+				C525F118106E622EC9C39418 /* BusinessCardImageAnalyzer.swift in Sources */,
+				173299C7633639BA20D76B1C /* BusinessCardImportModels.swift in Sources */,
+				44E54151D9DE73E3E3AF1FA2 /* BusinessCardImportView.swift in Sources */,
+				F563236EA3A19940A3B4A793 /* BusinessCardImportViewModel.swift in Sources */,
+				F73EB839C64BCD0E7743D7B2 /* BusinessCardRepository.swift in Sources */,
+				6337C8BF92F75F37EF932425 /* BusinessCardRepositoryProtocol.swift in Sources */,
 				ACAF14066DD349470D22EE05 /* Checksum.swift in Sources */,
 				E563484B39B8DD10CA11BCC7 /* ConfirmationCodeGenerator.swift in Sources */,
+				53B14D01ABB961A67750D8F5 /* ContactLinkEntity.swift in Sources */,
+				0A28C7BEA2C7E8147A2BC721 /* ContactLinkNormalizer.swift in Sources */,
 				F60A9E74B2A8520C754C06A2 /* CosCardApp.swift in Sources */,
 				BB500FDD6E66DFF0054D3992 /* CreateProfileUseCase.swift in Sources */,
 				CDEC9DECE2DCE1D27A67B20C /* Date+Format.swift in Sources */,
@@ -702,6 +760,7 @@
 				28856CB05087532BE662A6AC /* ExchangeState.swift in Sources */,
 				1D61B3EB34022D4185FBB1A6 /* ExchangeTokenEntity.swift in Sources */,
 				80826620D658D37958480E78 /* ExchangeViewModel.swift in Sources */,
+				A48B3E3934D303ED032CBD19 /* ExtractionResultEntity.swift in Sources */,
 				21CE97677F2D0677F40976D4 /* GenerateEphemeralTokenUseCase.swift in Sources */,
 				4E8358D013E7DC2C8B31D509 /* HistoryListView.swift in Sources */,
 				FA1D48F65159D03A94A043EE /* HistoryListViewModel.swift in Sources */,
@@ -744,6 +803,7 @@
 				EF310AC9071E49BFA0F94B7A /* ResolveDuplicateExchangeUseCase.swift in Sources */,
 				4FB80777485651FF14AD8B1A /* RootView.swift in Sources */,
 				2749E73228E37D2B1525415C /* SNSUserID.swift in Sources */,
+				838E5FDFF8552CD3907C3643 /* SaveBusinessCardImportUseCase.swift in Sources */,
 				8490D81C76A63FAB870A6DE2 /* SaveExchangeResultUseCase.swift in Sources */,
 				608345C48AD631B1224924A5 /* SendInviteUseCase.swift in Sources */,
 				8DC5FA9EDA0230C843DBAFB0 /* SettingsView.swift in Sources */,

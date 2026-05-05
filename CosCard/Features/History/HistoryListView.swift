@@ -3,6 +3,7 @@ import SwiftUI
 struct HistoryListView: View {
     @EnvironmentObject private var env: AppEnvironment
     @StateObject private var vm = HistoryListViewModel()
+    @State private var showBusinessCardImport = false
 
     var body: some View {
         Group {
@@ -44,6 +45,14 @@ struct HistoryListView: View {
             vm.searchTextDidChange()
         }
         .toolbar {
+            ToolbarItem(placement: .topBarLeading) {
+                Button {
+                    showBusinessCardImport = true
+                } label: {
+                    Image(systemName: "camera.viewfinder")
+                        .accessibilityLabel("名刺取り込み")
+                }
+            }
             ToolbarItem(placement: .topBarTrailing) {
                 Picker("表示", selection: $vm.filter) {
                     ForEach(HistoryListViewModel.Filter.allCases) { filter in
@@ -58,6 +67,12 @@ struct HistoryListView: View {
         }
         .navigationDestination(for: UUID.self) { id in
             PeerDetailView(peerId: id)
+        }
+        .sheet(isPresented: $showBusinessCardImport) {
+            BusinessCardImportView { _ in
+                Task { await vm.load() }
+            }
+            .environmentObject(env)
         }
         .refreshable { await vm.load() }
         .task {

@@ -3,6 +3,7 @@ import Foundation
 @MainActor
 final class PeerDetailViewModel: ObservableObject {
     @Published private(set) var detail: PeerDetail?
+    @Published private(set) var contactLinks: [ContactLinkSummary] = []
 
     private var env: AppEnvironment?
 
@@ -14,6 +15,7 @@ final class PeerDetailViewModel: ObservableObject {
         guard let env else { return }
         do {
             detail = try await env.peerRepository.fetchPeer(id: peerId)
+            contactLinks = try await env.businessCardRepository.listLinks(peerContactId: peerId)
         } catch {
             AppLogger.log("fetchPeer failed: \(error.localizedDescription)", category: "PeerDetail")
         }

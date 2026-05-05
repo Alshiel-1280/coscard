@@ -172,4 +172,12 @@ private final class StubPeerRepository: PeerRepositoryProtocol {
         XCTFail("Unexpected upsertPeerFromExchange call")
         return UUID()
     }
+
+    func upsertPeerFromBusinessCard(
+        draft: BusinessCardImportDraft,
+        mergePeerId: UUID?
+    ) async throws -> UUID {
+        XCTFail("Unexpected upsertPeerFromBusinessCard call")
+        return UUID()
+    }
 }

@@ -61,4 +61,9 @@ protocol PeerRepositoryProtocol: AnyObject {
         memo: String?,
         eventTag: String?
     ) async throws -> UUID
+
+    func upsertPeerFromBusinessCard(
+        draft: BusinessCardImportDraft,
+        mergePeerId: UUID?
+    ) async throws -> UUID
 }
